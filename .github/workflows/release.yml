@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Checkout code
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
 
     - name: Set up Python 3.12
-    - uses: actions/setup-python@v5
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
@@ -19,12 +19,12 @@ jobs:
       run: python run.py
 
     - name: Upload model
-    - uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v1
       with:
         files: model.pkl
 
     - name: Upload bag of words
-    - uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v1
       with:
         files: bag_of_words.pkl
 
