@@ -33,6 +33,9 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
+      - name: Set output
+        run: echo "TAG_NAME=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
+        id: tag
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -63,10 +66,12 @@ jobs:
     - name: Upload model
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ needs.tag-release.outputs.TAG_NAME }}
         files: model.pkl
 
     - name: Upload bag of words
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ needs.tag-release.outputs.TAG_NAME }}
         files: bag_of_words.pkl
         
