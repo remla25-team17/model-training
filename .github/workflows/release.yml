@@ -9,7 +9,7 @@ on:
 jobs:
   
   tag-release:
-    name: Generate Release
+    name: Generate Release with Artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Create GitHub App Token
@@ -33,10 +33,15 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
-      - name: Set output
-        run: echo "TAG_NAME=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
-        id: tag
-      - name: Create Release
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Train model
+        run: python run.py
+      - name: Create Release and Upload Artifacts
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ steps.generate-token.outputs.token }}
@@ -44,34 +49,7 @@ jobs:
           name: Release ${{ steps.gitversion.outputs.semVer }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
-
-  build:
-    needs: tag-release
-    runs-on: ubuntu-24.04
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-
-    - name: Install dependencies
-      run: pip install -r requirements.txt
-
-    - name: Train model
-      run: python run.py
-
-    - name: Upload model
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ needs.tag-release.outputs.TAG_NAME }}
-        files: model.pkl
-
-    - name: Upload bag of words
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ needs.tag-release.outputs.TAG_NAME }}
-        files: bag_of_words.pkl
-        
+          files: |
+            model.pkl
+            bag_of_words.pkl
+      
