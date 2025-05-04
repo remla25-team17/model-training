@@ -7,33 +7,7 @@ on:
       - develop/**
 
 jobs:
-  build:
-    runs-on: ubuntu-24.04
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-
-    - name: Install dependencies
-      run: pip install -r requirements.txt
-
-    - name: Train model
-      run: python run.py
-
-    - name: Upload model
-      uses: softprops/action-gh-release@v1
-      with:
-        files: model.pkl
-
-    - name: Upload bag of words
-      uses: softprops/action-gh-release@v1
-      with:
-        files: bag_of_words.pkl
-
+  
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
@@ -67,4 +41,32 @@ jobs:
           name: Release ${{ steps.gitversion.outputs.semVer }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
+
+  build:
+    needs: tag-release
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Train model
+      run: python run.py
+
+    - name: Upload model
+      uses: softprops/action-gh-release@v1
+      with:
+        files: model.pkl
+
+    - name: Upload bag of words
+      uses: softprops/action-gh-release@v1
+      with:
+        files: bag_of_words.pkl
         
