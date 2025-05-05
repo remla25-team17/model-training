@@ -80,6 +80,7 @@ jobs:
     - name: Upload model
       uses: softprops/action-gh-release@v1
       with:
+        token: ${{ steps.generate-token.outputs.token }}
         tag_name: ${{ needs.tag-release.outputs.tag }}
         files: model.pkl
 
