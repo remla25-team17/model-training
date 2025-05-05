@@ -9,8 +9,10 @@ on:
 jobs:
   
   tag-release:
-    name: Generate Release with Artifacts
+    name: Generate Release
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.latest_stable.outputs.tag }}
     steps:
       - name: Create GitHub App Token
         id: generate-token
@@ -33,23 +35,49 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Train model
-        run: python run.py
-      - name: Create Release and Upload Artifacts
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ steps.generate-token.outputs.token }}
           tag_name: ${{ steps.gitversion.outputs.semVer }}
           name: Release ${{ steps.gitversion.outputs.semVer }}
+          target_commitish: ${{ github.sha }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
-          files: |
-            model.pkl
-            bag_of_words.pkl
-      
+      - name: Get latest stable release tag
+        id: latest_stable
+        run: |
+          git fetch --tags
+          TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+  build:
+    needs: tag-release
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Train model
+      run: python run.py
+
+    - name: Upload model
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.tag-release.outputs.tag }}
+        files: model.pkl
+
+    - name: Upload bag of words
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.tag-release.outputs.tag }}
+        files: bag_of_words.pkl
+        
