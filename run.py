@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import pickle
 
@@ -7,7 +6,6 @@ from lib_ml.preprocessing import preprocess_reviews
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.model_selection import train_test_split
 import pickle
 from sklearn.naive_bayes import GaussianNB
