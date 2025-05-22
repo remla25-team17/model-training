@@ -3,13 +3,15 @@ name: Build and (Pre)Release
 on:
   push:
 
+
 jobs:
-  
+
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.latest_stable.outputs.tag }}
+      version: ${{ steps.gitversion.outputs.semVer }}
+
     steps:
       - name: Create GitHub App Token
         id: generate-token
@@ -17,21 +19,25 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ steps.generate-token.outputs.token }}
           persist-credentials: false
           fetch-depth: 0
+
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: '5.12.0'
+
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -41,56 +47,57 @@ jobs:
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
-      - name: Get latest stable release tag
-        id: latest_stable
-        run: |
-          git fetch --tags
-          TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
 
   build:
+    name: Build and Upload Artifacts
+    runs-on: ubuntu-latest
     needs: tag-release
-    runs-on: ubuntu-24.04
+    env:
+      version: ${{ needs.tag-release.outputs.version }}
+
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Create GitHub App Token
-      id: generate-token
-      uses: actions/create-github-app-token@v1
-      with:
-        app-id: ${{ vars.APP_ID }}
-        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Create GitHub App Token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-    - name: Install dependencies
-      run: pip install -r requirements.txt
+      - name: Inject version into pyproject.toml
+        run: |
+          sed -i "s/version = \"0.0.0\"/version = \"$version\"/" pyproject.toml
 
-    - name: Get data
-      run: python sentiment_model_training/modeling/get_data.py
+      - name: Get data
+        run: python sentiment_model_training/modeling/get_data.py
 
-    - name: Preprocess data
-      run: python sentiment_model_training/modeling/preprocess.py
+      - name: Preprocess data
+        run: python sentiment_model_training/modeling/preprocess.py
 
-    - name: Train model
-      run: python sentiment_model_training/modeling/train.py
+      - name: Train model
+        run: python sentiment_model_training/modeling/train.py
 
-    - name: Upload model
-      uses: softprops/action-gh-release@v1
-      with:
-        token: ${{ steps.generate-token.outputs.token }}
-        tag_name: ${{ needs.tag-release.outputs.tag }}
-        files: model/model.pkl
+      - name: Upload model
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          tag_name: ${{ env.version }}
+          files: model/model.pkl
 
-    - name: Upload bag of words
-      uses: softprops/action-gh-release@v1
-      with:
-        token: ${{ steps.generate-token.outputs.token }}
-        tag_name: ${{ needs.tag-release.outputs.tag }}
-        files: model/bag_of_words.pkl
-        
+      - name: Upload bag of words
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          tag_name: ${{ env.version }}
+          files: model/bag_of_words.pkl
