@@ -3,16 +3,13 @@ name: Build and (Pre)Release
 on:
   push:
     branches:
-      - main
-      - develop/**
 
 jobs:
-  
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.export-version.outputs.version }}
+      tag: ${{ steps.latest_stable.outputs.tag }}
     steps:
       - name: Create GitHub App Token
         id: generate-token
@@ -29,15 +26,12 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
-          versionSpec: '5.12.0'
+          versionSpec: "5.12.0"
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
-      - name: Export GitVersion Outputs
-        id: export-version
-        run: echo "version=${{ steps.gitversion.outputs.majorMinorPatch }}" >> $GITHUB_OUTPUT
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -47,17 +41,17 @@ jobs:
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
+      - name: Get latest stable release tag
+        id: latest_stable
+        run: |
+          git fetch --tags
+          TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
   build:
-    runs-on: ubuntu-latest
     needs: tag-release
-    env:
-      version: ${{ needs.tag-release.outputs.version }}
-      
+    runs-on: ubuntu-24.04
     steps:
-
-      - uses: actions/checkout@v4
-
       - name: Create GitHub App Token
         id: generate-token
         uses: actions/create-github-app-token@v1
@@ -71,14 +65,10 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      - name: Inject version into pyproject.toml
-        run: |
-          sed -i "s/version = \"0.0.0\"/version = \"${version}\"/" pyproject.toml
 
       - name: Get data
         run: python sentiment_model_training/modeling/get_data.py
@@ -93,13 +83,12 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          tag_name: ${{ env.version }}
+          tag_name: ${{ needs.tag-release.outputs.tag }}
           files: model.pkl
 
       - name: Upload bag of words
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          tag_name: ${{ env.version }}
+          tag_name: ${{ needs.tag-release.outputs.tag }}
           files: bag_of_words.pkl
-          
