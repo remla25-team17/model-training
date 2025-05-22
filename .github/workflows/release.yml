@@ -2,9 +2,9 @@ name: Build and (Pre)Release
 
 on:
   push:
-    branches:
 
 jobs:
+  
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
@@ -26,7 +26,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
-          versionSpec: "5.12.0"
+          versionSpec: '5.12.0'
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
@@ -52,43 +52,45 @@ jobs:
     needs: tag-release
     runs-on: ubuntu-24.04
     steps:
-      - name: Create GitHub App Token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Create GitHub App Token
+      id: generate-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ vars.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
 
-      - name: Get data
-        run: python sentiment_model_training/modeling/get_data.py
+    - name: Install dependencies
+      run: pip install -r requirements.txt
 
-      - name: Preprocess data
-        run: python sentiment_model_training/modeling/preprocess.py
+    - name: Get data
+      run: python sentiment_model_training/modeling/get_data.py
 
-      - name: Train model
-        run: python sentiment_model_training/modeling/train.py
+    - name: Preprocess data
+      run: python sentiment_model_training/modeling/preprocess.py
 
-      - name: Upload model
-        uses: softprops/action-gh-release@v1
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
-          tag_name: ${{ needs.tag-release.outputs.tag }}
-          files: model.pkl
+    - name: Train model
+      run: python sentiment_model_training/modeling/train.py
 
-      - name: Upload bag of words
-        uses: softprops/action-gh-release@v1
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
-          tag_name: ${{ needs.tag-release.outputs.tag }}
-          files: bag_of_words.pkl
+    - name: Upload model
+      uses: softprops/action-gh-release@v1
+      with:
+        token: ${{ steps.generate-token.outputs.token }}
+        tag_name: ${{ needs.tag-release.outputs.tag }}
+        files: model/model.pkl
+
+    - name: Upload bag of words
+      uses: softprops/action-gh-release@v1
+      with:
+        token: ${{ steps.generate-token.outputs.token }}
+        tag_name: ${{ needs.tag-release.outputs.tag }}
+        files: model/bag_of_words.pkl
+        
