@@ -31,7 +31,7 @@ def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
     corpus = preprocess_reviews(dataset)
 
     # Create a CountVectorizer to convert text data into a bag-of-words representation
-    cv = CountVectorizer(max_features)
+    cv = CountVectorizer(max_features=max_features)
     X = cv.fit_transform(corpus).toarray()
 
     # Extract labels from the dataset
@@ -65,8 +65,8 @@ def main(data_path: str, model_path: str, max_features: int = 1420):
 
     # Save the processed data
     np.save(processed_dataset_path, X)
-    pickle.dump(y, labels_path)
-    pickle.dump(cv, bow_path)
+    pickle.dump(y, open(labels_path, "wb"))
+    pickle.dump(cv, open(bow_path, "wb"))
 
 if __name__ == "__main__":
 
