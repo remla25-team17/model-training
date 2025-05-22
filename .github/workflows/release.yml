@@ -12,7 +12,7 @@ jobs:
     name: Generate Release
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.latest_stable.outputs.tag }}
+      version: ${{ steps.export-version.outputs.version }}
     steps:
       - name: Create GitHub App Token
         id: generate-token
@@ -35,6 +35,9 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
+      - name: Export GitVersion Outputs
+        id: export-version
+        run: echo "version=${{ steps.gitversion.outputs.majorMinorPatch }}" >> $GITHUB_OUTPUT
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -44,50 +47,59 @@ jobs:
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
-      - name: Get latest stable release tag
-        id: latest_stable
-        run: |
-          git fetch --tags
-          TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
   build:
     needs: tag-release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.tag-release.outputs.version }}
+      
     steps:
 
-    - name: Create GitHub App Token
-      id: generate-token
-      uses: actions/create-github-app-token@v1
-      with:
-        app-id: ${{ vars.APP_ID }}
-        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Create GitHub App Token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: pip install -r requirements.txt
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-    - name: Train model
-      run: python run.py
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-    - name: Upload model
-      uses: softprops/action-gh-release@v1
-      with:
-        token: ${{ steps.generate-token.outputs.token }}
-        tag_name: ${{ needs.tag-release.outputs.tag }}
-        files: model.pkl
+      - name: Inject version into pyproject.toml
+        run: |
+          sed -i "s/version = \"0.0.0\"/version = \"${version}\"/" pyproject.toml
 
-    - name: Upload bag of words
-      uses: softprops/action-gh-release@v1
-      with:
-        token: ${{ steps.generate-token.outputs.token }}
-        tag_name: ${{ needs.tag-release.outputs.tag }}
-        files: bag_of_words.pkl
-        
+      - name: Get data
+        run: python sentiment_model_training/modeling/get_data.py
+
+      - name: Preprocess data
+        run: python sentiment_model_training/modeling/preprocess.py
+
+      - name: Train model
+        run: python sentiment_model_training/modeling/train.py
+
+      - name: Upload model
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          tag_name: ${{ version }}
+          files: model.pkl
+
+      - name: Upload bag of words
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          tag_name: ${{ version }}
+          files: bag_of_words.pkl
+          
