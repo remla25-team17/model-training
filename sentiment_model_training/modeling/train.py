@@ -1,14 +1,14 @@
 import os
 import joblib
-import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 
+
 def train_model(data_path: str = "data/", model_path: str = "model/", test_size: float = 0.20, random_state: int = 0):
     """
     Main function to execute the model training process.
-    
+
     Parameters:
     - data_path (str): The path to the dataset directory.
     - model_path (str): The path to the model directory.
@@ -23,16 +23,17 @@ def train_model(data_path: str = "data/", model_path: str = "model/", test_size:
     classifier = GaussianNB()
     classifier.fit(X_train, y_train)
 
-    joblib.dump(classifier, os.path.join(model_path, "model.pkl")) 
+    joblib.dump(classifier, os.path.join(model_path, "model.pkl"))
 
     # Save data for evaluation
     joblib.dump(X_test, os.path.join(data_path, "X_test.pkl"))
     joblib.dump(y_test, os.path.join(data_path, "y_test.pkl"))
 
+
 if __name__ == "__main__":
 
     # Set the paths for the dataset and model directories
-    data_path = "data/"
-    model_path = "model/"
+    DATA_PATH = "data/"
+    MODEL_PATH = "model/"
 
-    train_model(data_path=data_path, model_path=model_path)
+    train_model(data_path=DATA_PATH, model_path=MODEL_PATH)
