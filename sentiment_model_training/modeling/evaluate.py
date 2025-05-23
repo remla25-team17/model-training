@@ -2,18 +2,18 @@ import os
 import joblib
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-def evaluate_model(data_path: str = "data/", model_path: str = "model/"):
+def evaluate_model(processed_data_path: str = "data/processed/", model_path: str = "model/"):
     """
     Main function to execute the model evaluation process.
     
     Parameters:
-    - data_path (str): The path to the dataset directory.
+    - processed_data_path (str): The path to the processed dataset directory.
     - model_path (str): The path to the model directory.
     """
 
     # Load the test data and labels
-    X_test = joblib.load(os.path.join(data_path, "X_test.pkl"))
-    y_test = joblib.load(os.path.join(data_path, "y_test.pkl"))
+    X_test = joblib.load(os.path.join(processed_data_path, "X_test.pkl"))
+    y_test = joblib.load(os.path.join(processed_data_path, "y_test.pkl"))
 
     # Load the trained model
     classifier = joblib.load(os.path.join(model_path, "model.pkl"))
@@ -38,7 +38,7 @@ def evaluate_model(data_path: str = "data/", model_path: str = "model/"):
 if __name__ == "__main__":
     
     # Set the paths for the dataset and model directories
-    data_path = "data/"
+    processed_data_path = "data/processed"
     model_path = "model/"
 
-    evaluate_model(data_path=data_path, model_path=model_path)
+    evaluate_model(processed_data_path=processed_data_path, model_path=model_path)
