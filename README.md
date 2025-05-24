@@ -10,6 +10,7 @@ A repository for training and deploying machine learning models for sentiment an
 - [Local Setup](#local-setup)
 - [Module Structure](#module-structure)
 - [GitHub Actions & CI/CD](#️-github-actions--cicd)
+- [Linting](#-linting)
 - [Resources](#-resources)
 - [Use of GenAI](#-use-of-genai)
 
@@ -78,7 +79,7 @@ The naming conventions are adapted to fit our specific sentiment analysis use ca
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.10
 - Restaurant Reviews dataset (automatically downloaded by the script)
 
 ### Python Dependencies
@@ -170,6 +171,41 @@ Following cookiecutter data science principles, we separate exploratory code fro
   - The version is automatically injected into the package's `pyproject.toml` file during CI/CD
 
 ---
+
+## [Linting](#-linting)
+
+To maintain code quality and consistency, this project uses the following linting tools:
+
+-   **Pylint**
+    * Includes a **custom Pylint checker** located in `lint/custom_rules.py` to identify unnecessary iteration (`for` and `while` loops), encouraging vectorized solutions in machine learning contexts.
+-   **Flake8**
+
+### Running Linting Checks Locally
+
+You can run these checks from the project root (`model-training/`):
+
+**Pylint:**
+
+Add the 'lint' directory to PYTHONPATH:
+```bash
+# For Linux/macOS
+export PYTHONPATH=$PYTHONPATH:./lint 
+```
+
+```bash
+#For Windows PowerShell
+$env:PYTHONPATH = ".\lint;$env:PYTHONPATH"
+```
+
+Run pylint:
+```bash
+pylint .\sentiment_model_training\
+```
+
+Run flake8:
+```bash
+flake8 .\sentiment_model_training\
+```
 
 ## [Resources](#-resources)
 
