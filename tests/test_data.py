@@ -13,6 +13,3 @@ def test_data_balanced():
     print(amount_of_positive_reviews, amount_of_negative_reviews)
     assert amount_of_positive_reviews / amount_of_negative_reviews > 0.8 # the ratio should be close to 1:1
     assert amount_of_negative_reviews / amount_of_positive_reviews > 0.8
-
-
-test_data_balanced()

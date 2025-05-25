@@ -174,6 +174,14 @@ Following cookiecutter data science principles, we separate exploratory code fro
 
 ## [Linting](#-linting)
 
+Pylint score:
+
+![Pylint Score](pylint.svg)
+
+Code coverage:
+
+![coverage](coverage.svg)
+
 To maintain code quality and consistency, this project uses the following linting tools:
 
 -   **Pylint**
@@ -186,20 +194,16 @@ You can run these checks from the project root (`model-training/`):
 
 **Pylint:**
 
-Add the 'lint' directory to PYTHONPATH:
-```bash
-# For Linux/macOS
-export PYTHONPATH=$PYTHONPATH:./lint 
-```
+install the custom rules:
 
 ```bash
-#For Windows PowerShell
-$env:PYTHONPATH = ".\lint;$env:PYTHONPATH"
+pip install -e .
 ```
 
-Run pylint:
+run pylint with the custom rules:
+
 ```bash
-pylint .\sentiment_model_training\
+pylint --load-plugins=lint.custom_rules .\sentiment_model_training\
 ```
 
 Run flake8:

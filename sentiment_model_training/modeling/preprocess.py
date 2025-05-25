@@ -1,3 +1,7 @@
+"""
+This module contains the code for preprocessing the dataset.
+"""
+
 import os
 import pickle
 import pandas as pd
@@ -23,7 +27,8 @@ def read_data(raw_dataset_path: str):
 
 def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
     """
-    This function preprocesses the dataset by transforming the text data into a bag-of-words representation.
+    This function preprocesses the dataset by transforming
+      the text data into a bag-of-words representation.
 
     Parameters:
     - dataset (pd.DataFrame): The dataset to be preprocessed.
@@ -41,12 +46,8 @@ def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
 
     return X, y, cv
 
-<<<<<<< HEAD
-def main(raw_data_path: str, processed_data_path: str, model_path: str, max_features: int = 1420):
-=======
 
-def main(data_path: str, model_path: str, max_features: int = 1420):
->>>>>>> f61f2bd36d269bcb736eaa6a6d49b4e199bfa0c3
+def main(raw_data_path, processed_data_path, model_path, max_features=1420):
     """
     Main function to execute the data reading and processing.
 
@@ -82,17 +83,9 @@ def main(data_path: str, model_path: str, max_features: int = 1420):
 
 if __name__ == "__main__":
 
-<<<<<<< HEAD
-    raw_data_path = "data/raw"
-    processed_data_path = "data/processed"
-    model_path = "model/"
-    max_features = 1420
-
-    main(raw_data_path, processed_data_path, model_path, max_features)
-=======
-    DATA_PATH = "data/"
+    RAW_DATA_PATH = "data/raw"
+    PROCESSED_DATA_PATH = "data/processed"
     MODEL_PATH = "model/"
     MAX_FEATURES = 1420
 
-    main(DATA_PATH, MODEL_PATH, MAX_FEATURES)
->>>>>>> f61f2bd36d269bcb736eaa6a6d49b4e199bfa0c3
+    main(RAW_DATA_PATH, PROCESSED_DATA_PATH, MODEL_PATH, MAX_FEATURES)
