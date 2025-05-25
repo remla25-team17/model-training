@@ -11,6 +11,7 @@ A repository for training and deploying machine learning models for sentiment an
 - [Local Setup](#local-setup)
 - [Data Versioning Control](#dvc)
 - [GitHub Actions & CI/CD](#️-github-actions--cicd)
+- [Linting](#-linting)
 - [Resources](#-resources)
 - [Use of GenAI](#-use-of-genai)
 
@@ -35,19 +36,21 @@ The project follows the [Cookiecutter Data Science](https://github.com/drivendat
 ├── LICENSE            <- MIT License
 ├── README.md          <- The top-level README for developers using this project
 ├── data               <- Directory containing all data files
-│   ├── raw.tsv        <- The original, immutable restaurant reviews data
-│   ├── processed.npy  <- The processed data sets for modeling
-│   ├── labels.pkl     <- Labels for sentiment analysis
-│   ├── X_test.pkl     <- Test data for evaluation
-│   └── y_test.pkl     <- Test labels for evaluation
+│   ├── raw/           <- Directory for raw data
+│   │   └── raw.tsv    <- The original, immutable restaurant reviews data
+│   └── processed/     <- Directory for processed data
+│       ├── processed.npy  <- The processed dataset for modeling
+│       ├── labels.pkl     <- Labels for sentiment analysis
+│       ├── X_test.pkl     <- Test data for evaluation
+│       └── y_test.pkl     <- Test labels for evaluation
 │
 ├── model              <- Trained and serialized models and model artifacts
 │   ├── model.pkl      <- The trained Gaussian Naive Bayes model
 │   └── bag_of_words.pkl <- The bag of words vectorizer for text preprocessing
 │
 ├── notebooks          <- Jupyter notebooks for exploration and demonstration
-│   ├── exploration.ipynb <- Exploratory data analysis, separate from production code
-│   └── demonstration.ipynb <- Model demonstration using production code
+│   ├── 1.0-g17-exploration_of_data.ipynb <- Exploratory data analysis, separate from production code
+│   └── 2.0-g17-demonstration_of_data.ipynb <- Model demonstration using production code
 │
 ├── pyproject.toml     <- Project configuration file with package metadata
 │
@@ -77,7 +80,7 @@ The naming conventions are adapted to fit our specific sentiment analysis use ca
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.10
 - Restaurant Reviews dataset (automatically downloaded by the script)
 
 ### Python Dependencies
@@ -287,6 +290,41 @@ Run `dvc exp show` to explore the results of different experiments/models.
 
 ---
 
+## [Linting](#-linting)
+
+To maintain code quality and consistency, this project uses the following linting tools:
+
+-   **Pylint**
+    * Includes a **custom Pylint checker** located in `lint/custom_rules.py` to identify unnecessary iteration (`for` and `while` loops), encouraging vectorized solutions in machine learning contexts.
+-   **Flake8**
+
+### Running Linting Checks Locally
+
+You can run these checks from the project root (`model-training/`):
+
+**Pylint:**
+
+Add the 'lint' directory to PYTHONPATH:
+```bash
+# For Linux/macOS
+export PYTHONPATH=$PYTHONPATH:./lint 
+```
+
+```bash
+#For Windows PowerShell
+$env:PYTHONPATH = ".\lint;$env:PYTHONPATH"
+```
+
+Run pylint:
+```bash
+pylint .\sentiment_model_training\
+```
+
+Run flake8:
+```bash
+flake8 .\sentiment_model_training\
+```
+
 ## [Resources](#-resources)
 
 - [Cookiecutter Data Science](https://github.com/drivendataorg/cookiecutter-data-science) - The project template that inspired our structure
@@ -295,5 +333,6 @@ Run `dvc exp show` to explore the results of different experiments/models.
 - [GitHub App Token](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app) - Documentation for GitHub App authentication
 
 ## [Use of GenAI](#-use-of-genai)
+
 - GenAI was used to generate the structure of the README.md file.
 - GenAI was used to generate the demonstration and exploration notebooks as part of an example as to how exploratory code can be separated from production code, thus following the cookiecutter template and project rubric.
