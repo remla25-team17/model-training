@@ -65,6 +65,13 @@ The project follows the [Cookiecutter Data Science](https://github.com/drivendat
 │       ├── preprocess.py <- Script to transform data (equivalent to features.py)
 │       ├── train.py   <- Script to train the sentiment analysis model
 │       └── evaluate.py <- Script to evaluate model performance (similar to predict.py)
+├── .dvc <- DVC configurations and cache
+│
+├── dvc.lock <- current state of the pipeline
+│
+├── dvc.yaml <- pipeline stages configuration
+│
+├── metrics.json <- evaluation metrics of the DVC evaluation stage
 ```
 
 Similar to the cookiecutter template, our project separates:
@@ -192,7 +199,7 @@ dvc remote add -d myremote gdrive://1bujWS5qyqKhs28Fwn5cPZ5Nr8brB7QoT
 
 ```bash
 dvc stage add -n get_data \
-  -o data/raw.tsv \
+  -o data/raw/raw.tsv \
   python sentiment_model_training/modeling/get_data.py
 ```
 
@@ -201,9 +208,9 @@ dvc stage add -n get_data \
 ```bash
 dvc stage add -n preprocess \
   -d sentiment_model_training/modeling/preprocess.py \
-  -d data/raw.tsv \
-  -o data/processed.npy \
-  -o data/labels.pkl \
+  -d data/raw/raw.tsv \
+  -o data/processed/processed.npy \
+  -o data/processed/labels.pkl \
   -o model/bag_of_words.pkl \
   python sentiment_model_training/modeling/preprocess.py
 ```
@@ -212,12 +219,12 @@ dvc stage add -n preprocess \
 ```bash
 dvc stage add -n train \
   -d sentiment_model_training/modeling/train.py \
-  -d data/processed.npy \
-  -d data/labels.pkl \
+  -d data/processed/processed.npy \
+  -d data/processed/labels.pkl \
   -d model/bag_of_words.pkl \
   -o model/model.pkl \
-  -o data/X_test.pkl \
-  -o data/y_test.pkl \
+  -o data/processed/X_test.pkl \
+  -o data/processed/y_test.pkl \
   python sentiment_model_training/modeling/train.py
 ```
 4. Evaluation stage:
@@ -226,8 +233,8 @@ dvc stage add -n train \
 dvc stage add -n evaluate \
   -d sentiment_model_training/modeling/evaluate.py \
   -d model/model.pkl \
-  -d data/X_test.pkl \
-  -d data/y_test.pkl \
+  -d data/processed/X_test.pkl \
+  -d data/processed/y_test.pkl \
   -M metrics.json \
   python sentiment_model_training/modeling/evaluate.py
 ```
