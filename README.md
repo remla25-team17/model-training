@@ -174,7 +174,12 @@ dvc remote add -d myremote gdrive://1bujWS5qyqKhs28Fwn5cPZ5Nr8brB7QoT
     4. [Enable the Drive API](https://developers.google.com/drive/api/v2/about-sdk) from the `APIs & Services Dashboard`, then find and select `Google Drive API`.
     5. In the `APIs & Services Dashboard`, click on OAuth consent screen and click on `Create`. For the Application name, use e.g. `DVC remote storage`.
     6. In the same dashboard view, click on `Credential` and then `Create Credentials`, select `OAuth client ID`. Add `http://localhost:8080/` in the authorized redirect URLs. This will identify our app (`remla`) to the Google OAuth servers. The newly generated `clientID` and `client secret` should be shown. These credentials are used to generate the authorization URL that is used to connect to the Google Drive.
-    7. **This needs to be done by every user locally**: Set up the credentials: `dvc remote modify myremote gdrive_client_id 'client-id'` and `dvc remote modify myremote gdrive_client_secret 'client-secret'`
+    7. **This needs to be done by every user locally**: Set up the credentials: 
+  
+        `dvc remote modify myremote gdrive_client_id 'client-id' --local` and
+        
+        `dvc remote modify myremote gdrive_client_secret 'client-secret' --local`
+
 4. Store the data in the project's cache: `dvc add data/` and the model: `dvc add model/` (not needed if pipeline below is setup)
 5. Push the data to our remote storage: `dvc push`
 6. `dvc pull` downloads tracked data from our dvc remote to the cache, and links the files to the workspace.
