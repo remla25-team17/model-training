@@ -1,6 +1,7 @@
 import os
 import joblib
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import json
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_score, recall_score
 
 def evaluate_model(data_path: str = "data/", model_path: str = "model/"):
     """
@@ -21,9 +22,20 @@ def evaluate_model(data_path: str = "data/", model_path: str = "model/"):
     # Make predictions on the test data
     y_pred = classifier.predict(X_test)
 
-    # Calculate accuracy
+    # Compute metrics
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"Accuracy: {accuracy:.2f}")
+    precision = precision_score(y_test, y_pred, average="binary")  # or "macro"/"weighted"
+    recall = recall_score(y_test, y_pred, average="binary")
+
+    # Save to metrics.json
+    metrics = {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall
+    }
+
+    with open("metrics.json", "w") as f:
+        json.dump(metrics, f, indent=4)
 
     # Generate classification report
     report = classification_report(y_test, y_pred)
@@ -36,7 +48,7 @@ def evaluate_model(data_path: str = "data/", model_path: str = "model/"):
     print(cm)
 
 if __name__ == "__main__":
-    
+
     # Set the paths for the dataset and model directories
     data_path = "data/"
     model_path = "model/"

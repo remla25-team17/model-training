@@ -5,10 +5,11 @@ A repository for training and deploying machine learning models for sentiment an
 ## Table of Contents
 
 - [Features](#features)
+- [Module Structure](#module-structure)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Local Setup](#local-setup)
-- [Module Structure](#module-structure)
+- [Data Versioning Control](#dvc)
 - [GitHub Actions & CI/CD](#️-github-actions--cicd)
 - [Resources](#-resources)
 - [Use of GenAI](#-use-of-genai)
@@ -105,7 +106,7 @@ Alternatively, you can install the package in development mode:
 pip install -e .
 ```
 
-## Local Setup
+## Local Setup 
 
 **Clone the repository:**
 
@@ -123,13 +124,13 @@ pip install -r requirements.txt
 **Run the complete pipeline:**
 
 ```bash
-# Step 1: Download the data
+# Step 1: Download the data (Or use DVC instead)
 python sentiment_model_training/modeling/get_data.py
 
-# Step 2: Preprocess the data
+# Step 2: Preprocess the data (Or use DVC preprocessed data instead)
 python sentiment_model_training/modeling/preprocess.py
 
-# Step 3: Train the model
+# Step 3: Train the model (Or use DVC instead)
 python sentiment_model_training/modeling/train.py
 
 # Step 4: Evaluate the model (optional)
@@ -143,7 +144,119 @@ Following cookiecutter data science principles, we separate exploratory code fro
 - `notebooks/exploration.ipynb` - Contains data exploration, analysis, and visualization. This notebook helps understand the dataset characteristics and inform modeling decisions but keeps exploratory code separate from production.
 - `notebooks/demonstration.ipynb` - Shows how to use the trained model for predictions and evaluation. This notebook demonstrates the application of the production code rather than developing new features.
 
-## [⚙️ GitHub Actions & CI/CD](#️-github-actions--cicd)
+
+## [Data Version Control](#dvc)
+We have set up Data Version Control (DVC) as our data management and ML pipeline automation solution for collaborative deployment.
+This helps us manage our dataset, ensure versioning, pull artifacts from external storage locations and have it shared across our team. Also, it allows us to track experiments and model versions. 
+> Before going further, please [install DVC](https://dvc.org/doc/install)
+
+For local usage, it's recommended to create a virtual environment:
+
+```bash
+python3 -m venv .env
+source .env/bin/activate
+```
+
+DVC enabled cross-project reusiability for our data artifact. We utilize DVC remotes which provides access to extral storage location. In our case, we support Google Drive remote. 
+
+To get started with DVC, we run `dvc init` command (For this repository, we already have this setup).
+
+### [Setting up external storage with Google Drive](https://dvc.org/doc/user-guide/data-management/remote-storage/google-drive#url-format) (Already done)
+1. Create a Folder in your Google Drive and give access to the users in your group.
+2. Set up the Google Drive remote folder URL: 
+```bash
+dvc remote add -d myremote gdrive://1bujWS5qyqKhs28Fwn5cPZ5Nr8brB7QoT
+```
+3. Use custom Google Cloud project to add extra level of permissions for the Google Drive remotes to connect to Google Drive. This can be used to apply API usage limits and allows us to set up a Service Account for automated tasks (e.g. CI/CD):
+    1. Sign into the [Google API Console](https://console.developers.google.com/). DVC will use this API to connect to Google Drive. This will require a Google Cloud project that allows Drive API connections and its OAuth credetianls (see [doc](https://dvc.org/doc/user-guide/data-management/remote-storage/google-drive)). 
+    2. [Create](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project) a project for DVC remote connection.
+    3. Add principals (e.g. users that work on the same project) and assign permissions.
+    4. [Enable the Drive API](https://developers.google.com/drive/api/v2/about-sdk) from the `APIs & Services Dashboard`, then find and select `Google Drive API`.
+    5. In the `APIs & Services Dashboard`, click on OAuth consent screen and click on `Create`. For the Application name, use e.g. `DVC remote storage`.
+    6. In the same dashboard view, click on `Credential` and then `Create Credentials`, select `OAuth client ID`. Add `http://localhost:8080/` in the authorized redirect URLs. This will identify our app (`remla`) to the Google OAuth servers. The newly generated `clientID` and `client secret` should be shown. These credentials are used to generate the authorization URL that is used to connect to the Google Drive.
+    7. **This needs to be done by every user locally**: Set up the credentials: `dvc remote modify myremote gdrive_client_id 'client-id'` and `dvc remote modify myremote gdrive_client_secret 'client-secret'`
+4. Store the data in the project's cache: `dvc add data/` and the model: `dvc add model/` (not needed if pipeline below is setup)
+5. Push the data to our remote storage: `dvc push`
+6. `dvc pull` downloads tracked data from our dvc remote to the cache, and links the files to the workspace.
+
+### DVC Pipeline (Already setup):
+1. Data downloading stage:
+
+```bash
+dvc stage add -n get_data \
+  -o data/raw.tsv \
+  python sentiment_model_training/modeling/get_data.py
+```
+
+2. Data preprocessing stage:
+
+```bash
+dvc stage add -n preprocess \
+  -d sentiment_model_training/modeling/preprocess.py \
+  -d data/raw.tsv \
+  -o data/processed.npy \
+  -o data/labels.pkl \
+  -o model/bag_of_words.pkl \
+  python sentiment_model_training/modeling/preprocess.py
+```
+3. Model training stage:
+
+```bash
+dvc stage add -n train \
+  -d sentiment_model_training/modeling/train.py \
+  -d data/processed.npy \
+  -d data/labels.pkl \
+  -d model/bag_of_words.pkl \
+  -o model/model.pkl \
+  -o data/X_test.pkl \
+  -o data/y_test.pkl \
+  python sentiment_model_training/modeling/train.py
+```
+4. Evaluation stage:
+
+```bash
+dvc stage add -n evaluate \
+  -d sentiment_model_training/modeling/evaluate.py \
+  -d model/model.pkl \
+  -d data/X_test.pkl \
+  -d data/y_test.pkl \
+  -M metrics.json \
+  python sentiment_model_training/modeling/evaluate.py
+```
+
+> You can inspect pipeline configurations at `dvc.yaml`.
+
+Now, we can run `dvc repro` which will execute all the stages in our pipeline, or run `dvc repro <pipeline_name>` for a specific stage.
+
+`dvc push` can now be run to store the results of `model/` and `data/` on the remote GDrive storage and use `dvc pull` to use that data locally. 
+
+### DVC Versioning
+Our ML pipeline is version-controlled, and you can go back in time to any previous version and reproduce exactly what was done, including the code, data, model and metrics. For this, we use Git commits to version code and pipeline and DVC to version data, model, and metrics:
+
+For example, if a change was made in `train.py`, do the following:
+```bash
+git add .
+git commit -m "New logic or hyperparams in train.py"
+```
+
+Then rollback:
+```bash
+git checkout <old_commit_id>
+dvc checkout
+```
+And rerun the entire previous pipeline: `dvc repro`
+
+### Metrics
+Evaluation metrics are stored in `metrics.json` and are generated as part of the `evaluation` stage. We register the following metrics:
+- accuracy
+- precision
+- recall
+
+Run `dvc exp show` to explore the results of different experiments/models.
+
+
+
+## [GitHub Actions & CI/CD](#️-github-actions--cicd)
 
 - **Automated ML Pipeline:**
 

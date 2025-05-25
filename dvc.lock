@@ -1,0 +1,89 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python sentiment_model_training/modeling/preprocess.py
+    deps:
+    - path: data/raw.tsv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+    - path: sentiment_model_training/modeling/preprocess.py
+      hash: md5
+      md5: 0a0305388e9966f366437c1fb965e551
+      size: 2438
+    outs:
+    - path: data/labels.pkl
+      hash: md5
+      md5: 198b1a27deaf58cda1c70875a09e1c95
+      size: 7352
+    - path: data/processed.npy
+      hash: md5
+      md5: 995938fe8b1da807571fce76124bd9d3
+      size: 10224128
+    - path: model/bag_of_words.pkl
+      hash: md5
+      md5: 51ed22b05a3cf7322f3b4fbc7182df19
+      size: 39451
+  get_data:
+    cmd: python sentiment_model_training/modeling/get_data.py
+    outs:
+    - path: data/raw.tsv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+  train:
+    cmd: python sentiment_model_training/modeling/train.py
+    deps:
+    - path: data/labels.pkl
+      hash: md5
+      md5: 198b1a27deaf58cda1c70875a09e1c95
+      size: 7352
+    - path: data/processed.npy
+      hash: md5
+      md5: 995938fe8b1da807571fce76124bd9d3
+      size: 10224128
+    - path: model/bag_of_words.pkl
+      hash: md5
+      md5: 51ed22b05a3cf7322f3b4fbc7182df19
+      size: 39451
+    - path: sentiment_model_training/modeling/train.py
+      hash: md5
+      md5: 0a836e0c6619d6afdc245aab0599254d
+      size: 1243
+    outs:
+    - path: data/X_test.pkl
+      hash: md5
+      md5: 5bd569c7768336bbfd97fea19176b0cd
+      size: 2045041
+    - path: data/y_test.pkl
+      hash: md5
+      md5: 2206173e02946f0a2594ab9f80fd8f50
+      size: 1665
+    - path: model/model.pkl
+      hash: md5
+      md5: 457ea82f8c39bcec80bf56416d5a348b
+      size: 46215
+  evaluate:
+    cmd: python sentiment_model_training/modeling/evaluate.py
+    deps:
+    - path: data/X_test.pkl
+      hash: md5
+      md5: 5bd569c7768336bbfd97fea19176b0cd
+      size: 2045041
+    - path: data/y_test.pkl
+      hash: md5
+      md5: 2206173e02946f0a2594ab9f80fd8f50
+      size: 1665
+    - path: model/model.pkl
+      hash: md5
+      md5: 457ea82f8c39bcec80bf56416d5a348b
+      size: 46215
+    - path: sentiment_model_training/modeling/evaluate.py
+      hash: md5
+      md5: e8d30f1b81fe4d10f335b3b632f708f2
+      size: 1683
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 596a2158ed90b1970453071935ee2980
+      size: 109
