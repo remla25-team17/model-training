@@ -2,10 +2,11 @@ import os
 import joblib
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
+
 def evaluate_model(processed_data_path: str = "data/processed/", model_path: str = "model/"):
     """
     Main function to execute the model evaluation process.
-    
+
     Parameters:
     - processed_data_path (str): The path to the processed dataset directory.
     - model_path (str): The path to the model directory.
@@ -35,10 +36,11 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
     print("Confusion Matrix:")
     print(cm)
 
-if __name__ == "__main__":
-    
-    # Set the paths for the dataset and model directories
-    processed_data_path = "data/processed"
-    model_path = "model/"
 
-    evaluate_model(processed_data_path=processed_data_path, model_path=model_path)
+if __name__ == "__main__":
+
+    # Set the paths for the dataset and model directories
+    PROCESSED_DATA_PATH = "data/processed"
+    MODEL_PATH = "model/"
+
+    evaluate_model(processed_data_path=PROCESSED_DATA_PATH, model_path=MODEL_PATH)
