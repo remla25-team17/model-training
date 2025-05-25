@@ -13,7 +13,6 @@ def read_data(raw_dataset_path: str):
 
     Parameters:
     - raw_dataset_path (str): The path to the raw dataset.
-    - processed_dataset_path (str): The path where the processed dataset will be saved.
     """
 
     # Read the raw dataset
@@ -43,23 +42,25 @@ def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
     return X, y, cv
 
 
-def main(data_path: str, model_path: str, max_features: int = 1420):
+def main(raw_data_path: str, processed_data_path: str, model_path: str, max_features: int = 1420):
     """
     Main function to execute the data reading and processing.
 
     Parameters:
-    - data_path (str): The path to the dataset directory.
+    - raw_data_path (str): The path to the raw dataset directory.
+    - processed_data_path (str): The path to the processed dataset directory.
     - model_path (str): The path to the model directory.
     """
 
     # Create directories if they do not exist
-    os.makedirs(data_path, exist_ok=True)
+    os.makedirs(raw_data_path, exist_ok=True)
+    os.makedirs(processed_data_path, exist_ok=True)
     os.makedirs(model_path, exist_ok=True)
 
     # Set the paths for the raw dataset, processed dataset, and labels
-    raw_dataset_path = os.path.join(data_path, "raw.tsv")
-    processed_dataset_path = os.path.join(data_path, "processed.npy")
-    labels_path = os.path.join(data_path, "labels.pkl")
+    raw_dataset_path = os.path.join(raw_data_path, "raw.tsv")
+    processed_dataset_path = os.path.join(processed_data_path, "processed.npy")
+    labels_path = os.path.join(processed_data_path, "labels.pkl")
 
     # Set the path for the bag-of-words model
     bow_path = os.path.join(model_path, "bag_of_words.pkl")
@@ -77,8 +78,9 @@ def main(data_path: str, model_path: str, max_features: int = 1420):
 
 if __name__ == "__main__":
 
-    DATA_PATH = "data/"
+    RAW_DATA_PATH = "data/raw"
+    PROCESSED_DATA_PATH = "data/processed"
     MODEL_PATH = "model/"
     MAX_FEATURES = 1420
 
-    main(DATA_PATH, MODEL_PATH, MAX_FEATURES)
+    main(RAW_DATA_PATH, PROCESSED_DATA_PATH, MODEL_PATH, MAX_FEATURES)

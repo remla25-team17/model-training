@@ -27,6 +27,6 @@ if __name__ == "__main__":
 
     # Set the URL and path for the dataset
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
-    SAVE_PATH = "data/raw.tsv"
+    SAVE_PATH = "data/raw/raw.tsv"
 
     get_data(url=URL, save_path=SAVE_PATH)

@@ -35,19 +35,21 @@ The project follows the [Cookiecutter Data Science](https://github.com/drivendat
 ├── LICENSE            <- MIT License
 ├── README.md          <- The top-level README for developers using this project
 ├── data               <- Directory containing all data files
-│   ├── raw.tsv        <- The original, immutable restaurant reviews data
-│   ├── processed.npy  <- The processed data sets for modeling
-│   ├── labels.pkl     <- Labels for sentiment analysis
-│   ├── X_test.pkl     <- Test data for evaluation
-│   └── y_test.pkl     <- Test labels for evaluation
+│   ├── raw/           <- Directory for raw data
+│   │   └── raw.tsv    <- The original, immutable restaurant reviews data
+│   └── processed/     <- Directory for processed data
+│       ├── processed.npy  <- The processed dataset for modeling
+│       ├── labels.pkl     <- Labels for sentiment analysis
+│       ├── X_test.pkl     <- Test data for evaluation
+│       └── y_test.pkl     <- Test labels for evaluation
 │
 ├── model              <- Trained and serialized models and model artifacts
 │   ├── model.pkl      <- The trained Gaussian Naive Bayes model
 │   └── bag_of_words.pkl <- The bag of words vectorizer for text preprocessing
 │
 ├── notebooks          <- Jupyter notebooks for exploration and demonstration
-│   ├── exploration.ipynb <- Exploratory data analysis, separate from production code
-│   └── demonstration.ipynb <- Model demonstration using production code
+│   ├── 1.0-g17-exploration_of_data.ipynb <- Exploratory data analysis, separate from production code
+│   └── 2.0-g17-demonstration_of_data.ipynb <- Model demonstration using production code
 │
 ├── pyproject.toml     <- Project configuration file with package metadata
 │
@@ -213,5 +215,6 @@ flake8 .\sentiment_model_training\
 - [GitHub App Token](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app) - Documentation for GitHub App authentication
 
 ## [Use of GenAI](#-use-of-genai)
+
 - GenAI was used to generate the structure of the README.md file.
 - GenAI was used to generate the demonstration and exploration notebooks as part of an example as to how exploratory code can be separated from production code, thus following the cookiecutter template and project rubric.
