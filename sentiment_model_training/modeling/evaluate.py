@@ -34,6 +34,13 @@ def evaluate_model(data_path: str = "data/", model_path: str = "model/"):
     cm = confusion_matrix(y_test, y_pred)
     print("Confusion Matrix:")
     print(cm)
+    
+    return {
+        "y_pred": y_pred,
+        "accuracy": accuracy,
+        "classification_report": report,
+        "confusion_matrix": cm
+    }
 
 if __name__ == "__main__":
     

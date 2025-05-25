@@ -18,6 +18,10 @@ def train_model(data_path: str = "data/", model_path: str = "model/", test_size:
     y = joblib.load(os.path.join(data_path, "labels.pkl"))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    
+    # Save data for training
+    joblib.dump(X_train, os.path.join(data_path, "X_train.pkl"))
+    joblib.dump(y_train, os.path.join(data_path, "y_train.pkl"))
 
     # Model fitting (Naive Bayes)
     classifier = GaussianNB()
