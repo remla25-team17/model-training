@@ -4,7 +4,8 @@ This module contains the code for evaluating the sentiment model.
 
 import os
 import joblib
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import json
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_score, recall_score
 
 
 def evaluate_model(processed_data_path: str = "data/processed/", model_path: str = "model/"):
@@ -26,9 +27,20 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
     # Make predictions on the test data
     y_pred = classifier.predict(X_test)
 
-    # Calculate accuracy
+    # Compute metrics
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"Accuracy: {accuracy:.2f}")
+    precision = precision_score(y_test, y_pred, average="binary")  # or "macro"/"weighted"
+    recall = recall_score(y_test, y_pred, average="binary")
+
+    # Save to metrics.json
+    metrics = {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall
+    }
+
+    with open("metrics.json", "w") as f:
+        json.dump(metrics, f, indent=4)
 
     # Generate classification report
     report = classification_report(y_test, y_pred)

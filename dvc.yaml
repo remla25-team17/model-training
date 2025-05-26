@@ -1,0 +1,35 @@
+stages:
+  get_data:
+    cmd: python sentiment_model_training/modeling/get_data.py
+    outs:
+    - data/raw/raw.tsv
+  preprocess:
+    cmd: python sentiment_model_training/modeling/preprocess.py
+    deps:
+    - data/raw/raw.tsv
+    - sentiment_model_training/modeling/preprocess.py
+    outs:
+    - data/processed/labels.pkl
+    - data/processed/processed.npy
+    - model/bag_of_words.pkl
+  train:
+    cmd: python sentiment_model_training/modeling/train.py
+    deps:
+    - data/processed/labels.pkl
+    - data/processed/processed.npy
+    - model/bag_of_words.pkl
+    - sentiment_model_training/modeling/train.py
+    outs:
+    - data/processed/X_test.pkl
+    - data/processed/y_test.pkl
+    - model/model.pkl
+  evaluate:
+    cmd: python sentiment_model_training/modeling/evaluate.py
+    deps:
+    - data/processed/X_test.pkl
+    - data/processed/y_test.pkl
+    - model/model.pkl
+    - sentiment_model_training/modeling/evaluate.py
+    metrics:
+    - metrics.json:
+        cache: false
