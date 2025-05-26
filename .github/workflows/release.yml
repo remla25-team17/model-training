@@ -63,6 +63,11 @@ jobs:
           coverage report -m > coverage.txt
           rm -f coverage.svg
           coverage-badge -o coverage.svg
+      - name: Commit coverage badge
+        run: |
+          git add coverage.svg
+          git commit -m "Add coverage badge"
+          git push
 
       
   tag-release:
