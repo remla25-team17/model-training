@@ -8,6 +8,63 @@ on:
 
 jobs:
 
+  lint:
+    name: Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Install custom rules
+        run: pip install -e .
+
+
+
+      - name: pylint
+        run: | 
+          pylint --load-plugins=lint.custom_rules ./sentiment_model_training/ > pylint-report.txt || true
+          SCORE=$(grep "rated at" pylint-report.txt | sed -E 's/.*rated at ([0-9\.]+)\/10.*/\1/')
+          anybadge -l pylint -v "$SCORE" -f pylint.svg --overwrite 2=red 4=orange 8=yellow 10=green
+
+
+      - name: flake8
+        run: flake8 ./sentiment_model_training/
+
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # - name: Run tests
+      #   run: pytest ./sentiment_model_training/
+
+      - name: Run coverage
+        run: |
+          coverage run --source=sentiment_model_training -m pytest
+          rm -f coverage.txt
+          coverage report -m > coverage.txt
+          rm -f coverage.svg
+          coverage-badge -o coverage.svg
+
+      
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
@@ -103,3 +160,5 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
           tag_name: ${{ env.version }}
           files: model/bag_of_words.pkl
+
+  

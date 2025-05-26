@@ -1,4 +1,15 @@
-data/
+# Ignore all files in data/
+data/**
+
+# But allow the subdirectories themselves to be tracked
+!data/
+!data/raw/
+!data/processed/
+
+# Allow the .gitkeep files so folders stay in the repo
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
 model/
 
 # Byte-compiled / optimized / DLL files
