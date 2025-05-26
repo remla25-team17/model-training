@@ -138,6 +138,11 @@ python sentiment_model_training/modeling/train.py
 # Step 4: Evaluate the model (optional)
 python sentiment_model_training/modeling/evaluate.py
 ```
+**Run tests with coverage**
+
+```bash
+pytest --cov=sentiment_model_training
+```
 
 **Explore and Demonstrate with Jupyter Notebooks:**
 
