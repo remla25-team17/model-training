@@ -51,13 +51,14 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
     cm = confusion_matrix(y_test, y_pred)
     print("Confusion Matrix:")
     print(cm)
-    
+
     return {
         "y_pred": y_pred,
         "accuracy": accuracy,
         "classification_report": report,
         "confusion_matrix": cm
     }
+
 
 if __name__ == "__main__":
 
