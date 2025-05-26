@@ -47,7 +47,7 @@ def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
     return X, y, cv
 
 
-def main(raw_data_path, processed_data_path, model_path, max_features=1420):
+def main(raw_data_path: str, processed_data_path: str, model_path: str, max_features: int = 1420):
     """
     Main function to execute the data reading and processing.
 
