@@ -78,13 +78,13 @@ def test_memory_usage(dataset):
     
     tracemalloc.start() 
     for it in range(100):
-        X_test = joblib.load(os.path.join("data/", "X_test.pkl"))
-        y_test = joblib.load(os.path.join("data/", "y_test.pkl"))
+        X_test = joblib.load(os.path.join("data/processed/", "X_test.pkl"))
+        y_test = joblib.load(os.path.join("data/processed/", "y_test.pkl"))
 
         X_test, y_test = shuffle(X_test, y_test)
 
-        joblib.dump(X_test, os.path.join("data/", "X_test.pkl"))
-        joblib.dump(y_test, os.path.join("data/", "y_test.pkl"))
+        joblib.dump(X_test, os.path.join("data/processed/", "X_test.pkl"))
+        joblib.dump(y_test, os.path.join("data/processed/", "y_test.pkl"))
         evaluate_model(processed_data_path="data/processed", model_path="model/")
        
     current, peak = tracemalloc.get_traced_memory()
