@@ -99,10 +99,10 @@ def model_train():
 def test_trained_model(model_train):
     initial_metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
     
-    X_train = joblib.load(os.path.join("data/", "X_train.pkl"))
-    y_train = joblib.load(os.path.join("data/", "y_train.pkl"))
-    X_test = joblib.load(os.path.join("data/", "X_test.pkl"))
-    y_test = joblib.load(os.path.join("data/", "y_test.pkl"))
+    X_train = joblib.load(os.path.join("data/processed/", "X_train.pkl"))
+    y_train = joblib.load(os.path.join("data/processed/", "y_train.pkl"))
+    X_test = joblib.load(os.path.join("data/processed/", "X_test.pkl"))
+    y_test = joblib.load(os.path.join("data/processed/", "y_test.pkl"))
     dummy_model = DummyClassifier(strategy="uniform", random_state=42)
     dummy_model.fit(X_train, y_train)
     y_pred_dummy = dummy_model.predict(X_test)
