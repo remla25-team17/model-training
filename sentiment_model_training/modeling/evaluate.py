@@ -1,3 +1,7 @@
+"""
+This module contains the code for evaluating the sentiment model.
+"""
+
 import os
 import joblib
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix

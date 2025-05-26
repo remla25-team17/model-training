@@ -1,3 +1,7 @@
+"""
+This module contains the code for training the sentiment model.
+"""
+
 import os
 import joblib
 import numpy as np
@@ -5,7 +9,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 
 
-def train_model(processed_data_path: str = "data/processed/", model_path: str = "model/", test_size: float = 0.20, random_state: int = 0):
+def train_model(processed_data_path: str = "data/processed/",
+                model_path: str = "model/", test_size: float = 0.20, random_state: int = 0):
     """
     Main function to execute the model training process.
 
@@ -17,7 +22,9 @@ def train_model(processed_data_path: str = "data/processed/", model_path: str = 
     X = np.load(os.path.join(processed_data_path, "processed.npy"))
     y = joblib.load(os.path.join(processed_data_path, "labels.pkl"))
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    X_train, X_test, y_train, y_test = (
+        train_test_split(X, y, test_size=test_size, random_state=random_state)
+    )
 
     # Model fitting (Naive Bayes)
     classifier = GaussianNB()

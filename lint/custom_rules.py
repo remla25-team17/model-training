@@ -1,5 +1,5 @@
 from pylint.checkers import BaseChecker
-from pylint.interfaces import IAstroidChecker
+
 
 class UnnecessaryIterationChecker(BaseChecker):
     """
@@ -10,7 +10,7 @@ class UnnecessaryIterationChecker(BaseChecker):
         where iterating over data can be inefficient compared to vectorized
         operations provided by libraries like NumPy or Pandas.
         """
-    __implements__ = IAstroidChecker
+    
 
     name = "unnecessary-iteration-checker"
     msgs = {

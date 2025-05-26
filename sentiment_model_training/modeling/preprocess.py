@@ -1,3 +1,7 @@
+"""
+This module contains the code for preprocessing the dataset.
+"""
+
 import os
 import pickle
 import pandas as pd
@@ -23,7 +27,8 @@ def read_data(raw_dataset_path: str):
 
 def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
     """
-    This function preprocesses the dataset by transforming the text data into a bag-of-words representation.
+    This function preprocesses the dataset by transforming
+      the text data into a bag-of-words representation.
 
     Parameters:
     - dataset (pd.DataFrame): The dataset to be preprocessed.
