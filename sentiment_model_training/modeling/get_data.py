@@ -31,8 +31,10 @@ def get_data(url: str, save_path: str):
 if __name__ == "__main__":
 
     # Set the URL and path for the dataset
-    URL = "https://raw.githubusercontent.com/proksch" + \
-          "/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
+    URL = ( 
+        "https://raw.githubusercontent.com/proksch"
+        "/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
+    )
     SAVE_PATH = "data/raw/raw.tsv"
 
     get_data(url=URL, save_path=SAVE_PATH)

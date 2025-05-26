@@ -59,7 +59,9 @@ jobs:
       - name: Run coverage
         run: |
           coverage run --source=sentiment_model_training -m pytest
+          rm -f coverage.txt
           coverage report -m > coverage.txt
+          rm -f coverage.svg
           coverage-badge -o coverage.svg
 
       
