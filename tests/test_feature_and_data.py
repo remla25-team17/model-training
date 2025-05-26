@@ -12,29 +12,29 @@ from sentiment_model_training.modeling.preprocess import main, read_data
 @pytest.fixture
 def dataset():
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
-    save_path = "data/raw.tsv"
+    save_path = "data/raw/raw.tsv"
 
-    get_data(URL=URL, save_path=save_path)
+    get_data(url=URL, save_path=save_path)
     raw_dataset = read_data(save_path)
     
-    main("data/", "model/", max_features=1420)
+    main("data/raw", "data/processed", "model/", max_features=1420)
     
-    processed_dataset = np.load("data/processed.npy")
+    processed_dataset = np.load("data/processed/processed.npy")
     
-    with open("data/labels.pkl", "rb") as f:
+    with open("data/processed/labels.pkl", "rb") as f:
         labels = pickle.load(f)
         
         
     yield raw_dataset, processed_dataset, labels
     
-    if os.path.exists("data/raw.tsv"):
-        os.remove("data/raw.tsv")
+    if os.path.exists("data/raw/raw.tsv"):
+        os.remove("data/raw/raw.tsv")
         
-    if os.path.exists("data/processed.npy"):
-        os.remove("data/processed.npy")
+    if os.path.exists("data/processed/processed.npy"):
+        os.remove("data/processed/processed.npy")
         
-    if os.path.exists("data/labels.pkl"):
-        os.remove("data/labels.pkl")
+    if os.path.exists("data/processed/labels.pkl"):
+        os.remove("data/processed/labels.pkl")
         
     if os.path.exists("model/bag_of_words.pkl"):
         os.remove("model/bag_of_words.pkl")

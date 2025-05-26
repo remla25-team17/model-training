@@ -14,53 +14,80 @@ from sentiment_model_training.modeling.train import train_model
 @pytest.fixture
 def dataset():
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
-    save_path = "data/raw.tsv"
+    save_path = "data/raw/raw.tsv"
 
-    get_data(URL=URL, save_path=save_path)
+    get_data(url=URL, save_path=save_path)
     raw_dataset = preprocess.read_data(save_path)
     
-    preprocess.main("data/", "model/", max_features=1420)
+    preprocess.main("data/raw", "data/processed", "model/", max_features=1420)
     
-    processed_dataset = np.load("data/processed.npy")
+    processed_dataset = np.load("data/processed/processed.npy")
     
-    with open("data/labels.pkl", "rb") as f:
+    with open("data/processed/labels.pkl", "rb") as f:
         labels = joblib.load(f)
         
     yield raw_dataset, processed_dataset, labels
     
-    if os.path.exists("data/raw.tsv"):
-        os.remove("data/raw.tsv")
+    if os.path.exists("data/raw/raw.tsv"):
+        os.remove("data/raw/raw.tsv")
         
-    if os.path.exists("data/processed.npy"):
-        os.remove("data/processed.npy")
+    if os.path.exists("data/processed/processed.npy"):
+        os.remove("data/processed/processed.npy")
         
-    if os.path.exists("data/labels.pkl"):
-        os.remove("data/labels.pkl")
+    if os.path.exists("data/processed/labels.pkl"):
+        os.remove("data/processed/labels.pkl")
+        
+    if os.path.exists("data/processed/X_train.pkl"):
+        os.remove("data/processed/X_train.pkl")
+        
+    if os.path.exists("data/processed/X_test.pkl"):
+        os.remove("data/processed/X_test.pkl")
+        
+    if os.path.exists("data/processed/y_train.pkl"):
+        os.remove("data/processed/y_train.pkl")
+        
+    if os.path.exists("data/processed/y_test.pkl"):
+        os.remove("data/processed/y_test.pkl")
         
     if os.path.exists("model/bag_of_words.pkl"):
         os.remove("model/bag_of_words.pkl")
-    
+        
+    if os.path.exists("model/model.pkl"):
+        os.remove("model/model.pkl")
+        
 @pytest.fixture
 def model_train():
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
-    save_path = "data/raw.tsv"
+    save_path = "data/raw/raw.tsv"
 
-    get_data(URL=URL, save_path=save_path)
+    get_data(url=URL, save_path=save_path)
     
-    preprocess.main("data/", "model/", max_features=1420)
+    preprocess.main("data/raw", "data/processed", "model/", max_features=1420)
     
-    train_model("data/", "model/")
+    train_model("data/processed/", "model/")
     
     yield 
     
-    if os.path.exists("data/raw.tsv"):
-        os.remove("data/raw.tsv")
+    if os.path.exists("data/raw/raw.tsv"):
+        os.remove("data/raw/raw.tsv")
         
-    if os.path.exists("data/processed.npy"):
-        os.remove("data/processed.npy")
+    if os.path.exists("data/processed/processed.npy"):
+        os.remove("data/processed/processed.npy")
         
-    if os.path.exists("data/labels.pkl"):
-        os.remove("data/labels.pkl")
+    if os.path.exists("data/processed/labels.pkl"):
+        os.remove("data/processed/labels.pkl")
+        
+    if os.path.exists("data/processed/X_train.pkl"):
+        os.remove("data/processed/X_train.pkl")
+        
+    if os.path.exists("data/processed/X_test.pkl"):
+        os.remove("data/processed/X_test.pkl")
+        
+    if os.path.exists("data/processed/y_train.pkl"):
+        os.remove("data/processed/y_train.pkl")
+        
+    if os.path.exists("data/processed/y_test.pkl"):
+        os.remove("data/processed/y_test.pkl")
         
     if os.path.exists("model/bag_of_words.pkl"):
         os.remove("model/bag_of_words.pkl")
@@ -70,7 +97,7 @@ def model_train():
     
 
 def test_trained_model(model_train):
-    initial_metrics = evaluate_model(data_path="data/", model_path="model/")
+    initial_metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
     
     X_train = joblib.load(os.path.join("data/", "X_train.pkl"))
     y_train = joblib.load(os.path.join("data/", "y_train.pkl"))
@@ -84,7 +111,7 @@ def test_trained_model(model_train):
     assert initial_metrics["accuracy"] > dummy_accuracy, "Trained model accuracy should be greater than dummy model accuracy"
     
 def test_model_quality_data_slices(model_train, dataset):
-    initial_metrics = evaluate_model(data_path="data/", model_path="model/")
+    initial_metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
     
     preprocessed_data_sliced = []
     labels_sliced = []
@@ -100,26 +127,26 @@ def test_model_quality_data_slices(model_train, dataset):
             labels_remained.append(dataset[2][index])
             
         
-    np.save("data/processed.npy", np.array(preprocessed_data_sliced))
-    pickle.dump(np.array(labels_sliced), open("data/labels.pkl", "wb"))
-    train_model("data/", "model/")
-    metrics_sliced_model = evaluate_model(data_path="data/", model_path="model/")
+    np.save("data/processed/processed.npy", np.array(preprocessed_data_sliced))
+    pickle.dump(np.array(labels_sliced), open("data/processed/labels.pkl", "wb"))
+    train_model("data/processed/", "model/")
+    metrics_sliced_model = evaluate_model(processed_data_path="data/processed", model_path="model/")
     
-    np.save("data/processed.npy", np.array(preprocessed_data_remained))
-    pickle.dump(np.array(labels_remained), open("data/labels.pkl", "wb"))
-    train_model("data/", "model/")
-    metrics_remained_model = evaluate_model(data_path="data/", model_path="model/")
+    np.save("data/processed/processed.npy", np.array(preprocessed_data_remained))
+    pickle.dump(np.array(labels_remained), open("data/processed/labels.pkl", "wb"))
+    train_model("data/processed/", "model/")
+    metrics_remained_model = evaluate_model(processed_data_path="data/processed", model_path="model/")
     
     
     assert abs(metrics_sliced_model["accuracy"] - initial_metrics["accuracy"]) < 0.1, "Model accuracy should not change significantly when data is sliced"
     assert abs(metrics_remained_model["accuracy"] - initial_metrics["accuracy"]) < 0.1, "Model accuracy should not change significantly when data is sliced"
     
 def test_nondeterminism_robustness(model_train):
-    initial_metrics = evaluate_model(data_path="data/", model_path="model/")
+    initial_metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
     
     for seed in range(6, 48, 6):
-        train_model("data/", "model/", random_state=seed)
-        metrics = evaluate_model(data_path="data/", model_path="model/")
+        train_model("data/processed/", "model/")
+        metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
         
         assert abs(metrics["accuracy"] - initial_metrics["accuracy"]) < 0.1, f"Model accuracy should not change significantly with different random states (seed={seed})"
     

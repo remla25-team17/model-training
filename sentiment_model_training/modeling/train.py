@@ -22,15 +22,13 @@ def train_model(processed_data_path: str = "data/processed/",
     X = np.load(os.path.join(processed_data_path, "processed.npy"))
     y = joblib.load(os.path.join(processed_data_path, "labels.pkl"))
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-    
-    # Save data for training
-    joblib.dump(X_train, os.path.join(data_path, "X_train.pkl"))
-    joblib.dump(y_train, os.path.join(data_path, "y_train.pkl"))
-
     X_train, X_test, y_train, y_test = (
         train_test_split(X, y, test_size=test_size, random_state=random_state)
     )
+    
+    # Save data for training
+    joblib.dump(X_train, os.path.join(processed_data_path, "X_train.pkl"))
+    joblib.dump(y_train, os.path.join(processed_data_path, "y_train.pkl"))
 
     # Model fitting (Naive Bayes)
     classifier = GaussianNB()
