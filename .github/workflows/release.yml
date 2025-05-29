@@ -39,6 +39,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add pylint.svg
           git commit -m "Add/update pylint badge"
+          git pull
           git push
         continue-on-error: true
       - name: flake8
@@ -75,6 +76,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add coverage.svg
           git commit -m "Add coverage badge"
+          git pull
           git push
         continue-on-error: true
 
