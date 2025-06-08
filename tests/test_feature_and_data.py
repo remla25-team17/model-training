@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import pickle
 import time
 import pandas as pd
@@ -12,32 +13,28 @@ from sentiment_model_training.modeling.preprocess import main, read_data
 @pytest.fixture
 def dataset():
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
-    save_path = "data/raw/raw.tsv"
+    raw_path = Path("data/raw/raw.tsv")
+    processed_dir = Path("data/processed")
 
-    get_data(url=URL, save_path=save_path)
-    raw_dataset = read_data(save_path)
-    
+    raw_path.parent.mkdir(parents=True, exist_ok=True)
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    Path("model/bag_of_words.pkl").parent.mkdir(parents=True, exist_ok=True)
+
+    get_data(url=URL, save_path=str(raw_path))
+    raw_dataset = read_data(str(raw_path))
     main("data/raw", "data/processed", "model/", max_features=1420)
-    
-    processed_dataset = np.load("data/processed/processed.npy")
-    
-    with open("data/processed/labels.pkl", "rb") as f:
+
+    processed_dataset = np.load( Path("data/processed/processed.npy"))
+    with open(Path("data/processed/labels.pkl"), "rb") as f:
         labels = pickle.load(f)
-        
-        
+
     yield raw_dataset, processed_dataset, labels
     
-    if os.path.exists("data/raw/raw.tsv"):
-        os.remove("data/raw/raw.tsv")
-        
-    if os.path.exists("data/processed/processed.npy"):
-        os.remove("data/processed/processed.npy")
-        
-    if os.path.exists("data/processed/labels.pkl"):
-        os.remove("data/processed/labels.pkl")
-        
-    if os.path.exists("model/bag_of_words.pkl"):
-        os.remove("model/bag_of_words.pkl")
+    cleanup_files = [raw_path, Path("data/processed/processed.npy"), Path("data/processed/labels.pkl"), Path("model/bag_of_words.pkl")]
+
+    for file in cleanup_files:
+        if file.exists():
+            file.unlink()
     
 def test_raw_data(dataset):
     assert all(data.Review.strip() != "" for data in dataset[0].itertuples()), "Data contains empty reviews"
