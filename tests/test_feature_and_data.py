@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import pickle
 import time
+from unittest import mock
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 from statsmodels.stats.proportion import proportion_confint
@@ -37,6 +38,9 @@ def dataset():
             file.unlink()
     
 def test_raw_data(dataset):
+    assert isinstance(dataset[0], pd.DataFrame), "Raw data is not a pandas DataFrame"
+    assert dataset[0].shape[0] > 0, "Raw data DataFrame is empty"
+    assert dataset[0].shape[1] == 2, "Raw data DataFrame does not have exactly two columns"
     assert all(data.Review.strip() != "" for data in dataset[0].itertuples()), "Data contains empty reviews"
     assert all(isinstance(data.Review, str) for data in dataset[0].itertuples()), "Data contains non-string reviews"
     assert all(isinstance(data.Liked, int) for data in dataset[0].itertuples()), "Data contains non-integer 'Liked' values"
@@ -60,5 +64,3 @@ def test_latency_of_feature(dataset):
         classifier.fit(dataset[1][:, [feature]], dataset[2])
         latency = time.time() - start_time
         assert latency < 0.5, f"Latency for feature {feature} exceeds 0.5 seconds"
-
-
