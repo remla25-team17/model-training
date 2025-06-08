@@ -23,6 +23,14 @@ def dataset():
     for file in cleanup_files:
         if file.exists():
             file.unlink()
+            
+def test_data_download():
+    result = subprocess.run(
+        ["python", "sentiment_model_training/modeling/get_data.py"],
+        capture_output=True,
+        text=True
+    )
+    assert result.returncode == 0
 
 def test_ML_pipeline(dataset):
     preprocess_step = subprocess.run(
