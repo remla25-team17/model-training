@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 from sentiment_model_training.modeling.get_data import get_data
 from sentiment_model_training.modeling.preprocess import main, read_data
+from scipy.stats import pearsonr
 
 @pytest.fixture
 def dataset():
@@ -41,6 +42,8 @@ def test_raw_data(dataset):
     assert isinstance(dataset[0], pd.DataFrame), "Raw data is not a pandas DataFrame"
     assert dataset[0].shape[0] > 0, "Raw data DataFrame is empty"
     assert dataset[0].shape[1] == 2, "Raw data DataFrame does not have exactly two columns"
+    assert all(col in dataset[0].columns for col in ["Review", "Liked"]), "Raw data DataFrame does not contain required columns 'Review' and 'Liked'"
+    assert not np.any(dataset[0].isnull()), "Raw data DataFrame contains null values"
     assert all(data.Review.strip() != "" for data in dataset[0].itertuples()), "Data contains empty reviews"
     assert all(isinstance(data.Review, str) for data in dataset[0].itertuples()), "Data contains non-string reviews"
     assert all(isinstance(data.Liked, int) for data in dataset[0].itertuples()), "Data contains non-integer 'Liked' values"
@@ -64,3 +67,14 @@ def test_latency_of_feature(dataset):
         classifier.fit(dataset[1][:, [feature]], dataset[2])
         latency = time.time() - start_time
         assert latency < 0.5, f"Latency for feature {feature} exceeds 0.5 seconds"
+        
+def test_feature_label_correlation(dataset):
+    features = dataset[1]
+    labels = dataset[2]
+    num_features = features.shape[1]
+    correlations = []
+    for i in range(num_features):
+        corr, pval = pearsonr(features[:, i], labels)
+        correlations.append(abs(corr))
+    max_corr = max(correlations)
+    assert max_corr > 0.1, "Maximum feature-label Pearson correlation too low"
