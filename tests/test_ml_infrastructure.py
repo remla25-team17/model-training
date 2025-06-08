@@ -30,7 +30,7 @@ def test_data_download():
         capture_output=True,
         text=True
     )
-    assert result.returncode == 0
+    assert result.returncode == 0, "Data download failed"
 
 def test_ML_pipeline(dataset):
     preprocess_step = subprocess.run(
