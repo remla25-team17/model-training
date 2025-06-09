@@ -7,10 +7,6 @@ import pickle
 import pandas as pd
 import numpy as np
 from lib_ml.preprocessing import embed_reviews
-from sklearn.feature_extraction.text import CountVectorizer
-
-from sentence_transformers import SentenceTransformer
-model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 
 def read_data(raw_dataset_path: str):
@@ -27,7 +23,7 @@ def read_data(raw_dataset_path: str):
 
     return dataset
 
-def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
+def preprocess(dataset: pd.DataFrame):
     """
     This function preprocesses the dataset by embedding the text data.
 
@@ -43,29 +39,8 @@ def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
     return X, y
 
 
-# def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
-#     """
-#     This function preprocesses the dataset by transforming
-#       the text data into a bag-of-words representation.
 
-#     Parameters:
-#     - dataset (pd.DataFrame): The dataset to be preprocessed.
-#     """
-
-#     # Get corpus from the dataset
-#     corpus = preprocess_reviews(dataset)
-
-#     # Create a CountVectorizer to convert text data into a bag-of-words representation
-#     cv = CountVectorizer(max_features=max_features)
-#     X = cv.fit_transform(corpus).toarray()
-
-#     # Extract labels from the dataset
-#     y = dataset.iloc[:, -1].values
-
-#     return X, y, cv
-
-
-def main(raw_data_path: str, processed_data_path: str, model_path: str, max_features: int = 1420):
+def main(raw_data_path: str, processed_data_path: str, model_path: str):
     """
     Main function to execute the data reading and processing.
 
@@ -89,7 +64,7 @@ def main(raw_data_path: str, processed_data_path: str, model_path: str, max_feat
     bow_path = os.path.join(model_path, "bag_of_words.pkl")
 
     dataset = read_data(raw_dataset_path)
-    X, y = preprocess(dataset, max_features)
+    X, y = preprocess(dataset)
 
     # Save the processed data
     np.save(processed_dataset_path, X)
@@ -102,6 +77,5 @@ if __name__ == "__main__":
     RAW_DATA_PATH = "data/raw"
     PROCESSED_DATA_PATH = "data/processed"
     MODEL_PATH = "model/"
-    MAX_FEATURES = 1420
 
-    main(RAW_DATA_PATH, PROCESSED_DATA_PATH, MODEL_PATH, MAX_FEATURES)
+    main(RAW_DATA_PATH, PROCESSED_DATA_PATH, MODEL_PATH)
