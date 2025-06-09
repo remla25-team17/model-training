@@ -2,7 +2,7 @@ import os
 import pickle
 import time
 import pandas as pd
-from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import LinearSVC
 from statsmodels.stats.proportion import proportion_confint
 import numpy as np
 import pytest
@@ -56,9 +56,9 @@ def test_distribution_of_labels(dataset):
     assert ci_low_label_positive > 0.4 and ci_upp_label_positive < 0.6, "Distribution of label 1 is not within expected bounds (0.40, 0.60)"
     
 def test_latency_of_feature(dataset):
-    max_features = 1420
+    max_features = 384
     for feature in range(max_features):
-        classifier = GaussianNB()
+        classifier = LinearSVC()
         start_time = time.time()
         classifier.fit(dataset[1][:, [feature]], dataset[2])
         latency = time.time() - start_time

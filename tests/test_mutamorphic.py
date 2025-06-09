@@ -7,7 +7,9 @@ from sentiment_model_training.modeling.evaluate import evaluate_model
 from sentiment_model_training.modeling.get_data import get_data
 import sentiment_model_training.modeling.preprocess as preprocess
 from sentiment_model_training.modeling.train import train_model
+from sentence_transformers import SentenceTransformer
 
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 @pytest.fixture
 def model_train():
@@ -16,7 +18,7 @@ def model_train():
 
     get_data(url=URL, save_path=save_path)
     
-    preprocess.main("data/raw", "data/processed/", "model/", max_features=1420)
+    preprocess.main("data/raw", "data/processed/", "model/", max_features=384)
     
     train_model("data/processed/", "model/")
     
@@ -52,11 +54,8 @@ def model_train():
 def test_synonyms(model_train):
     X_test = ["The food and atmosphere were amazing. I love this restaurant!", "The food and atmosphere were amazing. I like this restaurant!", "The food was terrible.", "The food was horrible."]
     y_test = [1, 1, 0, 0]
-    
-    with open("model/bag_of_words.pkl", "rb") as f:
-        bow = joblib.load(f)
-    
-    X_test_processed = bow.transform(X_test).toarray()
+
+    X_test_processed = model.encode(X_test)
     
     joblib.dump(X_test_processed, os.path.join("data/processed/", "X_test.pkl"))
     joblib.dump(np.array(y_test), os.path.join("data/processed/", "y_test.pkl"))

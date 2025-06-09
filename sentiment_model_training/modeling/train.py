@@ -6,7 +6,7 @@ import os
 import joblib
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import LinearSVC
 
 
 def train_model(processed_data_path: str = "data/processed/",
@@ -30,8 +30,8 @@ def train_model(processed_data_path: str = "data/processed/",
     joblib.dump(X_train, os.path.join(processed_data_path, "X_train.pkl"))
     joblib.dump(y_train, os.path.join(processed_data_path, "y_train.pkl"))
 
-    # Model fitting (Naive Bayes)
-    classifier = GaussianNB()
+    # Model fitting (Linear SVM)
+    classifier = LinearSVC()
     classifier.fit(X_train, y_train)
 
     joblib.dump(classifier, os.path.join(model_path, "model.pkl"))
