@@ -23,7 +23,8 @@ def read_data(raw_dataset_path: str):
 
     return dataset
 
-def preprocess(dataset: pd.DataFrame):
+
+def preprocess(dataset: pd.DataFrame, max_features: int):
     """
     This function preprocesses the dataset by embedding the text data.
 
@@ -35,12 +36,12 @@ def preprocess(dataset: pd.DataFrame):
     embeddings = embed_reviews(dataset)
 
     X = np.array(embeddings)
+    assert X.shape[1] == max_features, "Number of features does not match max_features"
     y = dataset.iloc[:, -1].values
     return X, y
 
 
-
-def main(raw_data_path: str, processed_data_path: str, model_path: str):
+def main(raw_data_path: str, processed_data_path: str, model_path: str, max_features: int):
     """
     Main function to execute the data reading and processing.
 
@@ -61,7 +62,7 @@ def main(raw_data_path: str, processed_data_path: str, model_path: str):
     labels_path = os.path.join(processed_data_path, "labels.pkl")
 
     dataset = read_data(raw_dataset_path)
-    X, y = preprocess(dataset)
+    X, y = preprocess(dataset, max_features)
 
     # Save the processed data
     np.save(processed_dataset_path, X)
@@ -74,5 +75,6 @@ if __name__ == "__main__":
     RAW_DATA_PATH = "data/raw"
     PROCESSED_DATA_PATH = "data/processed"
     MODEL_PATH = "model/"
+    MAX_FEATURES = 384
 
-    main(RAW_DATA_PATH, PROCESSED_DATA_PATH, MODEL_PATH)
+    main(RAW_DATA_PATH, PROCESSED_DATA_PATH, MODEL_PATH, MAX_FEATURES)
