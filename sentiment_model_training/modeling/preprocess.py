@@ -6,8 +6,11 @@ import os
 import pickle
 import pandas as pd
 import numpy as np
-from lib_ml.preprocessing import preprocess_reviews
+from lib_ml.preprocessing import embed_reviews
 from sklearn.feature_extraction.text import CountVectorizer
+
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 
 def read_data(raw_dataset_path: str):
@@ -24,27 +27,42 @@ def read_data(raw_dataset_path: str):
 
     return dataset
 
-
 def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
     """
-    This function preprocesses the dataset by transforming
-      the text data into a bag-of-words representation.
+    This function preprocesses the dataset by embedding the text data.
 
     Parameters:
     - dataset (pd.DataFrame): The dataset to be preprocessed.
     """
 
     # Get corpus from the dataset
-    corpus = preprocess_reviews(dataset)
+    embeddings = embed_reviews(dataset)
 
-    # Create a CountVectorizer to convert text data into a bag-of-words representation
-    cv = CountVectorizer(max_features=max_features)
-    X = cv.fit_transform(corpus).toarray()
-
-    # Extract labels from the dataset
+    X = np.array(embeddings)
     y = dataset.iloc[:, -1].values
+    return X, y
 
-    return X, y, cv
+
+# def preprocess(dataset: pd.DataFrame, max_features: int = 1420):
+#     """
+#     This function preprocesses the dataset by transforming
+#       the text data into a bag-of-words representation.
+
+#     Parameters:
+#     - dataset (pd.DataFrame): The dataset to be preprocessed.
+#     """
+
+#     # Get corpus from the dataset
+#     corpus = preprocess_reviews(dataset)
+
+#     # Create a CountVectorizer to convert text data into a bag-of-words representation
+#     cv = CountVectorizer(max_features=max_features)
+#     X = cv.fit_transform(corpus).toarray()
+
+#     # Extract labels from the dataset
+#     y = dataset.iloc[:, -1].values
+
+#     return X, y, cv
 
 
 def main(raw_data_path: str, processed_data_path: str, model_path: str, max_features: int = 1420):
@@ -71,14 +89,12 @@ def main(raw_data_path: str, processed_data_path: str, model_path: str, max_feat
     bow_path = os.path.join(model_path, "bag_of_words.pkl")
 
     dataset = read_data(raw_dataset_path)
-    X, y, cv = preprocess(dataset, max_features)
+    X, y = preprocess(dataset, max_features)
 
     # Save the processed data
     np.save(processed_dataset_path, X)
     with open(labels_path, "wb") as file:
         pickle.dump(y, file)
-    with open(bow_path, "wb") as file:
-        pickle.dump(cv, file)
 
 
 if __name__ == "__main__":
