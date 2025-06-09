@@ -60,9 +60,6 @@ def main(raw_data_path: str, processed_data_path: str, model_path: str):
     processed_dataset_path = os.path.join(processed_data_path, "processed.npy")
     labels_path = os.path.join(processed_data_path, "labels.pkl")
 
-    # Set the path for the bag-of-words model
-    bow_path = os.path.join(model_path, "bag_of_words.pkl")
-
     dataset = read_data(raw_dataset_path)
     X, y = preprocess(dataset)
 
