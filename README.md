@@ -65,6 +65,9 @@ The project follows the [Cookiecutter Data Science](https://github.com/drivendat
 │       ├── preprocess.py <- Script to transform data (equivalent to features.py)
 │       ├── train.py   <- Script to train the sentiment analysis model
 │       └── evaluate.py <- Script to evaluate model performance (similar to predict.py)
+|
+├── tests              <- Automated tests
+|
 ├── .dvc <- DVC configurations and cache
 │
 ├── dvc.lock <- current state of the pipeline
