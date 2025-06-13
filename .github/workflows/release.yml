@@ -47,6 +47,9 @@ jobs:
       - name: flake8
         run: flake8 ./sentiment_model_training/
 
+      - name: bandit
+        run: bandit -c .bandit -r sentiment_model_training/
+
   testing:
     name: Testing
     runs-on: ubuntu-latest
@@ -71,8 +74,10 @@ jobs:
         run: |
           mkdir -p metrics
           coverage run --source=sentiment_model_training -m pytest
+          rm -f metrics/coverage.txt
           coverage report -m > metrics/coverage.txt
-          coverage-badge -o metrics/coverage.svg --overwrite
+          rm -f metrics/coverage.svg
+          coverage-badge -o metrics/coverage.svg 
 
       - name: Commit badges
         run: |
