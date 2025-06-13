@@ -302,32 +302,51 @@ Run `dvc exp show` to explore the results of different experiments/models.
 
 To maintain code quality and consistency, this project uses the following linting tools:
 
-- **Pylint**
+- **Pylint** - A comprehensive linter that checks for errors, enforces coding standards, and looks for code smells
   - Includes a **custom Pylint checker** located in `lint/custom_rules.py` to identify unnecessary iteration (`for` and `while` loops), encouraging vectorized solutions in machine learning contexts.
-- **Flake8**
+- **Flake8** - A wrapper around PyFlakes, pycodestyle, and McCabe for style guide enforcement
+- **Bandit** - A security linter designed to find common security issues in Python code
 
 ### Running Linting Checks Locally
 
 You can run these checks from the project root (`model-training/`):
 
-**Pylint:**
+#### Install Linting Tools
 
-install the custom rules:
+All necessary linting tools are included in the requirements.txt file:
+
+```bash
+pip install -r requirements.txt
+```
+
+For the custom Pylint rules, install the package in development mode:
 
 ```bash
 pip install -e .
 ```
 
-run pylint with the custom rules:
+#### Running Pylint
+
+Run pylint with the custom rules:
 
 ```bash
 pylint --load-plugins=lint.custom_rules .\sentiment_model_training\
 ```
 
-Run flake8:
+#### Running Flake8
+
+Check code style with Flake8:
 
 ```bash
 flake8 .\sentiment_model_training\
+```
+
+#### Running Bandit
+
+Scan for security issues with Bandit:
+
+```bash
+ bandit -c .bandit -r sentiment_model_training/
 ```
 
 ---
