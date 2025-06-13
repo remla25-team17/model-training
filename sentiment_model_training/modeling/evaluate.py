@@ -29,7 +29,7 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
 
     # Compute metrics
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average="binary")  
+    precision = precision_score(y_test, y_pred, average="binary")
     recall = recall_score(y_test, y_pred, average="binary")
 
     # Save to metrics.json

@@ -59,9 +59,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # - name: Run tests
-      #   run: pytest ./sentiment_model_training/
-
       - name: Run coverage
         run: |
           coverage run --source=sentiment_model_training -m pytest
@@ -69,11 +66,6 @@ jobs:
           coverage report -m > coverage.txt
           rm -f coverage.svg
           coverage-badge -o coverage.svg
-
-      - name: Generate ML Test Score badge
-        run: |
-          pip install anybadge
-          python generate_ml_test_badge.py
 
       - name: Commit badges
         run: |
