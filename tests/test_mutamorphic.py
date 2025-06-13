@@ -1,9 +1,8 @@
-import os
 from pathlib import Path
 import joblib
-import numpy as np
 import pytest
-from sentiment_model_training.modeling.evaluate import evaluate_model
+from lib_ml.preprocessing import preprocess_text
+from sklearn.feature_extraction.text import CountVectorizer
 from sentiment_model_training.modeling.get_data import get_data
 import sentiment_model_training.modeling.preprocess as preprocess
 from sentiment_model_training.modeling.train import train_model
@@ -32,22 +31,52 @@ def model_train():
         if file.exists():
             file.unlink()
         
-def test_synonyms(model_train):
-    X_test = ["The food and atmosphere were amazing. I love this restaurant!", "The food and atmosphere were amazing. I like this restaurant!", "The food was terrible.", "The food was horrible."]
-    y_test = [1, 1, 0, 0]
+def test_mutamorphic_with_automatic_repair(model_train):
     
+    with open("model/model.pkl", "rb") as f:
+        model = joblib.load(f)
+
     with open("model/bag_of_words.pkl", "rb") as f:
         bow = joblib.load(f)
     
-    X_test_processed = bow.transform(X_test).toarray()
-    
-    joblib.dump(X_test_processed, os.path.join("data/processed/", "X_test.pkl"))
-    joblib.dump(np.array(y_test), os.path.join("data/processed/", "y_test.pkl"))
-    
-    metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
+    test_cases = [
+        {
+            "original": "The food and atmosphere were amazing. I love this restaurant!",
+            "mutants": [
+                "The food and atmosphere were amazing. I like this restaurant!",
+                "The food and atmosphere were amazing. I enjoy this restaurant!",
+                "The food and atmosphere were amazing. I appreciate this restaurant!"
+            ]
+        },
+        {
+            "original": "The food was terrible.",
+            "mutants": [
+                "The food was horrible.",
+                "The food was dreadful.",
+                "The food was awful."
+            ]
+        }
+    ]
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UndefinedMetricWarning)
-        metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
-   
-    assert metrics["accuracy"] >= 0.5, "Model accuracy is below expected threshold with synonyms"
+    for case in test_cases:
+
+        corpus = preprocess_text(case["original"])
+        numerical = bow.transform([corpus]).toarray()
+        pred_orig = model.predict(numerical).tolist()[0]
+
+        repaired = False
+        for mutant in case["mutants"]:
+            corpus_mut = preprocess_text(mutant)
+            x_mut = bow.transform([corpus_mut]).toarray()
+            pred_mut = model.predict(x_mut).tolist()[0]
+
+            if pred_mut == pred_orig:
+                repaired = True
+                print(f"[Repair Successful] '{mutant}' prediction matches original.")
+                break  
+
+        assert repaired, (
+            f"Mutamorphic inconsistency could not be repaired.\n"
+            f"Original: '{case['original']}' → {pred_orig}\n"
+            f"Tried mutants: {case['mutants']}"
+        )

@@ -12,6 +12,7 @@ ML_TEST_SECTIONS = {
     "test_ml_infrastructure.py": "ML Infrastructure Tests",
     "test_model_development.py": "Model Development Tests",
     "test_monitoring.py": "Monitoring Tests",
+    "test_mutamorphic.py": "Mutamorphic Testing",
 }
 
 # Store test outcomes here
