@@ -7,10 +7,9 @@ on:
       - develop/**
 
 permissions:
-  contents: write 
-  
-jobs:
+  contents: write
 
+jobs:
   lint:
     name: Linter
     runs-on: ubuntu-latest
@@ -21,15 +20,15 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Install custom rules
         run: pip install -e .
       - name: pylint
-        run: | 
+        run: |
           pylint --load-plugins=lint.custom_rules ./sentiment_model_training/ > pylint-report.txt || true
           SCORE=$(grep "rated at" pylint-report.txt | sed -E 's/.*rated at ([0-9\.]+)\/10.*/\1/')
           anybadge -l pylint -v "$SCORE" -f pylint.svg --overwrite 2=red 4=orange 8=yellow 10=green
@@ -55,7 +54,7 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -70,17 +69,22 @@ jobs:
           coverage report -m > coverage.txt
           rm -f coverage.svg
           coverage-badge -o coverage.svg
-      - name: Commit coverage badge
+
+      - name: Generate ML Test Score badge
+        run: |
+          pip install anybadge
+          python generate_ml_test_badge.py
+
+      - name: Commit badges
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add coverage.svg
-          git commit -m "Add coverage badge"
+          git add coverage.svg ml_test_score.svg metrics.json
+          git commit -m "Add/update badges and metrics"
           git pull
           git push
         continue-on-error: true
 
-      
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
@@ -105,7 +109,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
-          versionSpec: '5.12.0'
+          versionSpec: "5.12.0"
 
       - name: Run GitVersion
         id: gitversion
@@ -122,7 +126,6 @@ jobs:
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
-
 
   build:
     name: Build and Upload Artifacts
@@ -145,7 +148,7 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -176,5 +179,3 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
           tag_name: ${{ env.version }}
           files: model/bag_of_words.pkl
-
-  

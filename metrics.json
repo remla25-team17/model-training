@@ -1,5 +1,25 @@
 {
-    "accuracy": 0.7277777777777777,
-    "precision": 0.8533333333333334,
-    "recall": 0.6274509803921569
+  "sections": {
+    "Data Tests": {
+      "score": 5,
+      "max_score": 5
+    },
+    "ML Infrastructure Tests": {
+      "score": 2,
+      "max_score": 2
+    },
+    "Model Development Tests": {
+      "score": 3,
+      "max_score": 3
+    },
+    "Monitoring Tests": {
+      "score": 2,
+      "max_score": 2
+    },
+    "Uncategorized": {
+      "score": 1,
+      "max_score": 1
+    }
+  },
+  "final_score": 1
 }

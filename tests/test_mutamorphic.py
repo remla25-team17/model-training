@@ -8,6 +8,8 @@ from sentiment_model_training.modeling.evaluate import evaluate_model
 from sentiment_model_training.modeling.get_data import get_data
 import sentiment_model_training.modeling.preprocess as preprocess
 from sentiment_model_training.modeling.train import train_model
+import warnings
+from sklearn.exceptions import UndefinedMetricWarning
 
 
 @pytest.fixture
@@ -44,5 +46,9 @@ def test_synonyms(model_train):
     joblib.dump(np.array(y_test), os.path.join("data/processed/", "y_test.pkl"))
     
     metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UndefinedMetricWarning)
+        metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
    
     assert metrics["accuracy"] >= 0.5, "Model accuracy is below expected threshold with synonyms"
