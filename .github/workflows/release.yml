@@ -62,25 +62,29 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run coverage
+      - name: Run ML tests and generate badges
+        run: |
+          mkdir -p metrics
+          pytest  # conftest.py should output to metrics/ml_test_score.svg and metrics/ml_scores.json
+
+      - name: Run coverage and generate badge
         run: |
           mkdir -p metrics
           coverage run --source=sentiment_model_training -m pytest
-          rm -f metrics/coverage.txt
           coverage report -m > metrics/coverage.txt
-          rm -f metrics/coverage.svg
           coverage-badge -o metrics/coverage.svg
 
       - name: Commit badges
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add metrics/coverage.svg metrics/ml_test_score.svg metrics/ml_scores.json
+          git config pull.rebase false
+          git add metrics/*.svg metrics/*.json
           git commit -m "Add/update badges and metrics"
-          git pull
+          git pull --no-rebase
           git push
         continue-on-error: true
-
+        
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
