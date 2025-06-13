@@ -27,20 +27,23 @@ jobs:
 
       - name: Install custom rules
         run: pip install -e .
+
       - name: pylint
         run: |
           pylint --load-plugins=lint.custom_rules ./sentiment_model_training/ > pylint-report.txt || true
           SCORE=$(grep "rated at" pylint-report.txt | sed -E 's/.*rated at ([0-9\.]+)\/10.*/\1/')
-          anybadge -l pylint -v "$SCORE" -f pylint.svg --overwrite 2=red 4=orange 8=yellow 10=green
+          anybadge -l pylint -v "$SCORE" -f metrics/pylint.svg --overwrite 2=red 4=orange 8=yellow 10=green
+
       - name: Commit pylint badge
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add pylint.svg
+          git add metrics/pylint.svg
           git commit -m "Add/update pylint badge"
           git pull
           git push
         continue-on-error: true
+
       - name: flake8
         run: flake8 ./sentiment_model_training/
 
@@ -61,6 +64,7 @@ jobs:
 
       - name: Run coverage
         run: |
+          mkdir -p metrics
           coverage run --source=sentiment_model_training -m pytest
           rm -f metrics/coverage.txt
           coverage report -m > metrics/coverage.txt
@@ -71,7 +75,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add metrics/coverage.svg metrics/ml_test_score.svg metrics/metrics.json
+          git add metrics/coverage.svg metrics/ml_test_score.svg metrics/ml_scores.json
           git commit -m "Add/update badges and metrics"
           git pull
           git push

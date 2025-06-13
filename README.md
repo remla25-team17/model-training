@@ -1,8 +1,8 @@
 # Model Training
 
-![Pylint Score](pylint.svg)
-![coverage](coverage.svg)
-![ML Test Score](ml_test_score.svg)
+![Pylint Score](metrics/pylint.svg)
+![coverage](metrics/coverage.svg)
+![ML Test Score](metrics/ml_test_score.svg)
 
 A repository for training and deploying machine learning models for sentiment analysis.
 
