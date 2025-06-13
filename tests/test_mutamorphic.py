@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import joblib
 import numpy as np
-import pandas as pd
 import pytest
 from sentiment_model_training.modeling.evaluate import evaluate_model
 from sentiment_model_training.modeling.get_data import get_data

@@ -39,6 +39,9 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
         "recall": recall
     }
 
+    if not os.path.exists("metrics"):
+        os.makedirs("metrics")
+
     with open("metrics.json", "w") as f:
         json.dump(metrics, f, indent=4)
 

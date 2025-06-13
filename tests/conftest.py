@@ -3,7 +3,6 @@ import sys
 import json
 from collections import defaultdict
 from pathlib import Path
-import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -37,8 +36,12 @@ def save_ml_test_score(section_scores, final_score):
         "sections": section_scores,
         "final_score": final_score
     }
-    metrics_path = Path(__file__).parent.parent / "metrics.json"
-    with open(metrics_path, "w") as f:
+    scores_path = Path(__file__).parent.parent / "metrics" / "ml_scores.json"
+
+    if not scores_path.parent.exists():
+        scores_path.parent.mkdir(parents=True)
+
+    with open(scores_path, "w") as f:
         json.dump(results, f, indent=2)
 
 def generate_badge(score):
@@ -60,7 +63,7 @@ def generate_badge(score):
             default_color='red'
         )
 
-        badge_path = Path(__file__).parent.parent / "ml_test_score.svg"
+        badge_path = Path(__file__).parent.parent / "metrics" / "ml_test_score.svg"
         badge.write_badge(badge_path, overwrite=True)
         print(f"ML Test Score badge saved to {badge_path}")
     except ImportError:
