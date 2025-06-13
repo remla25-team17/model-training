@@ -1,0 +1,11 @@
+# .bandit
+exclude_dirs:
+  - .venv
+  - venv
+  - .git
+  - docs
+
+skips:
+  - B101  
+  - B303  
+  - B403 # We have pickle files in the repo
