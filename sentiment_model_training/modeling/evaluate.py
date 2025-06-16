@@ -29,7 +29,7 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
 
     # Compute metrics
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average="binary")  # or "macro"/"weighted"
+    precision = precision_score(y_test, y_pred, average="binary")
     recall = recall_score(y_test, y_pred, average="binary")
 
     # Save to metrics.json
@@ -39,11 +39,14 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
         "recall": recall
     }
 
+    if not os.path.exists("metrics"):
+        os.makedirs("metrics")
+
     with open("metrics.json", "w") as f:
         json.dump(metrics, f, indent=4)
 
     # Generate classification report
-    report = classification_report(y_test, y_pred)
+    report = classification_report(y_test, y_pred, zero_division=0)
     print("Classification Report:")
     print(report)
 

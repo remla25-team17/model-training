@@ -26,7 +26,7 @@ def dataset():
     raw_dataset = read_data(str(raw_path))
     main("data/raw", "data/processed", "model/", max_features=1420)
 
-    processed_dataset = np.load( Path("data/processed/processed.npy"))
+    processed_dataset = np.load(Path("data/processed/processed.npy"))
     with open(Path("data/processed/labels.pkl"), "rb") as f:
         labels = pickle.load(f)
         
@@ -59,7 +59,7 @@ def test_processed_data(dataset):
     
     
 def test_distribution_of_labels(dataset):
-    labels, count = np.unique(dataset[2], return_counts=True)
+    _, count = np.unique(dataset[2], return_counts=True)
     total = count.sum()
     
     ci_low_label_negative, ci_upp_label_negative = proportion_confint(count[0], total, alpha=0.05, method='wilson')
