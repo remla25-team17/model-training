@@ -3,9 +3,10 @@ This module contains the code for downloading the dataset from a given URL
  and saving it to a specified path.
 """
 
+import argparse
 import os
 import requests
-import argparse
+
 
 def get_data(url: str, save_path: str):
     """
@@ -38,8 +39,18 @@ if __name__ == "__main__":
     SAVE_PATH = "data/raw/"
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", type=str, default=URL, help="url for where to download the raw dataset")
-    parser.add_argument("--save_path", type=str, default=SAVE_PATH, help="directory for where to save the raw dataset")
+    parser.add_argument(
+        "--url",
+        type=str,
+        default=URL,
+        help="url for where to download the raw dataset",
+    )
+    parser.add_argument(
+        "--save_path",
+        type=str,
+        default=SAVE_PATH,
+        help="directory for where to save the raw dataset",
+    )
     args = parser.parse_args()
 
     get_data(url=args.url, save_path=args.save_path)

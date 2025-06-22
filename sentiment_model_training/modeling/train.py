@@ -1,13 +1,13 @@
 """
 This module contains the code for training the sentiment model.
 """
-
+import argparse
 import os
 import joblib
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-import argparse
+
 
 
 def train_model(processed_data_path: str = "data/processed/",
@@ -51,10 +51,20 @@ if __name__ == "__main__":
     RANDOM_STATE = 0
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=str, default=PROCESSED_DATA_PATH, help="input path of the data")
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=PROCESSED_DATA_PATH,
+        help="input path of the data",
+    )
     parser.add_argument("--model_path", type=str, default=MODEL_PATH, help="model path")
     parser.add_argument("--test_size", type=float, default=TEST_SIZE, help="test size")
-    parser.add_argument("--seed", type=int, default=RANDOM_STATE, help="random state")
+    parser.add_argument("--seed", type=int, default=RANDOM_STATE, help="random state",)
     args = parser.parse_args()
 
-    train_model(processed_data_path=args.input, model_path=args.model_path, test_size=args.test_size, random_state=args.seed)
+    train_model(
+        processed_data_path=args.input,
+        model_path=args.model_path,
+        test_size=args.test_size,
+        random_state=args.seed,
+    )

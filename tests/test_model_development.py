@@ -18,10 +18,11 @@ from sentiment_model_training.modeling.preprocess import main, read_data
 def dataset():    
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
     raw_path = Path("data/raw/raw.tsv")
+    raw_directory = Path("data/raw")
     
     raw_path.parent.mkdir(parents=True, exist_ok=True)
     
-    get_data(url=URL, save_path=str(raw_path))
+    get_data(url=URL, save_path=str(raw_directory))
     raw_dataset = read_data(str(raw_path))
     main("data/raw", "data/processed", "model/", max_features=1420)
 
@@ -41,10 +42,11 @@ def dataset():
 def model_train():
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
     raw_path = Path("data/raw/raw.tsv")
+    raw_directory = Path("data/raw")
     
     raw_path.parent.mkdir(parents=True, exist_ok=True)
     
-    get_data(url=URL, save_path=str(raw_path))
+    get_data(url=URL, save_path=str(raw_directory))
     
     preprocess.main("data/raw", "data/processed", "model/", max_features=1420)
     
