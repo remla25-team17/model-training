@@ -266,6 +266,9 @@ Now, we can run `dvc repro` which will execute all the stages in our pipeline, o
 
 `dvc push` can now be run to store the results of `model/` and `data/` on the remote GDrive storage and use `dvc pull` to use that data locally.
 
+The diagram below provides an overview of our DVC setup, illustrating the four-stage pipeline and its interaction with Google Drive storage during local development:
+![alt text](dvc_pipeline.png)
+
 ### DVC Versioning
 
 Our ML pipeline is version-controlled, and you can go back in time to any previous version and reproduce exactly what was done, including the code, data, model and metrics. For this, we use Git commits to version code and pipeline and DVC to version data, model, and metrics:
