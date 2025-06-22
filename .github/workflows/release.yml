@@ -6,8 +6,90 @@ on:
       - main
       - develop/**
 
-jobs:
+permissions:
+  contents: write
 
+jobs:
+  lint:
+    name: Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install custom rules
+        run: pip install -e .
+
+      - name: pylint
+        run: |
+          pylint --load-plugins=lint.custom_rules ./sentiment_model_training/ > pylint-report.txt || true
+          SCORE=$(grep "rated at" pylint-report.txt | sed -E 's/.*rated at ([0-9\.]+)\/10.*/\1/')
+          anybadge -l pylint -v "$SCORE" -f metrics/pylint.svg --overwrite 2=red 4=orange 8=yellow 10=green
+
+      - name: Commit pylint badge
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add metrics/pylint.svg
+          git commit -m "Add/update pylint badge"
+          git pull
+          git push
+        continue-on-error: true
+
+      - name: flake8
+        run: flake8 ./sentiment_model_training/
+
+      - name: bandit
+        run: bandit -c .bandit -r sentiment_model_training/
+
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run ML tests and generate badges
+        run: |
+          mkdir -p metrics
+          pytest  # conftest.py should output to metrics/ml_test_score.svg and metrics/ml_scores.json
+
+      - name: Run coverage and generate badge
+        run: |
+          mkdir -p metrics
+          coverage run --source=sentiment_model_training -m pytest
+          rm -f metrics/coverage.txt
+          coverage report -m > metrics/coverage.txt
+          rm -f metrics/coverage.svg
+          coverage-badge -o metrics/coverage.svg 
+
+      - name: Commit badges
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config pull.rebase false
+          git add metrics/*.svg metrics/*.json
+          git commit -m "Add/update badges and metrics"
+          git pull --no-rebase
+          git push
+        continue-on-error: true
+        
   tag-release:
     name: Generate Release
     runs-on: ubuntu-latest
@@ -32,7 +114,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
-          versionSpec: '5.12.0'
+          versionSpec: "5.12.0"
 
       - name: Run GitVersion
         id: gitversion
@@ -49,7 +131,6 @@ jobs:
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           prerelease: ${{ contains(steps.gitversion.outputs.semVer, '-') }}
-
 
   build:
     name: Build and Upload Artifacts
@@ -72,7 +153,7 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: pip install -r requirements.txt

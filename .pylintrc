@@ -1,0 +1,15 @@
+[MASTER]
+load-plugins=lint.custom_rules
+
+[BASIC]
+good-names=i,
+    j,
+    k,
+    ex,
+    Run,
+    X_train,
+    Y_train,
+    X_test,
+    Y_test,
+    X,
+    Y,
