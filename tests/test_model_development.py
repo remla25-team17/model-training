@@ -107,7 +107,7 @@ def test_nondeterminism_robustness(model_train):
     initial_metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
     
     for seed in range(6, 48, 6):
-        train_model("data/processed/", "model/")
+        train_model("data/processed/", "model/", random_state=seed)
         metrics = evaluate_model(processed_data_path="data/processed", model_path="model/")
         
         assert abs(metrics["accuracy"] - initial_metrics["accuracy"]) < 0.1, f"Model accuracy should not change significantly with different random states (seed={seed})"
