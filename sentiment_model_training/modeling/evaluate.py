@@ -14,6 +14,7 @@ from sklearn.metrics import (
     recall_score
 )
 
+
 def evaluate_model(processed_data_path: str = "data/processed/", model_path: str = "model/"):
     """
     Main function to execute the model evaluation process.

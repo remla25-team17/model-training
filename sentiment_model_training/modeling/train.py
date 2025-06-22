@@ -9,7 +9,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 
 
-
 def train_model(processed_data_path: str = "data/processed/",
                 model_path: str = "model/", test_size: float = 0.20, random_state: int = 0):
     """

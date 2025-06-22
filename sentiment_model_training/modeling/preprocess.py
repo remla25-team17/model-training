@@ -90,10 +90,11 @@ if __name__ == "__main__":
     MAX_FEATURES = 1420
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input",
-                        type=str,
-                        default=RAW_DATA_PATH,
-                        help="input path of the data",
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=RAW_DATA_PATH,
+        help="input path of the data",
     )
     parser.add_argument(
         "--output",
