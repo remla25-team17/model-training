@@ -37,58 +37,88 @@ A repository for training and deploying machine learning models for sentiment an
 The project follows the [Cookiecutter Data Science](https://github.com/drivendataorg/cookiecutter-data-science) project structure, a widely adopted standard template for data science projects. Our implementation is organized as follows:
 
 ```
+├── .bandit            <- Bandit security linter configuration
+├── .coverage          <- Coverage report data file
+├── .flake8            <- Flake8 linter configuration
+├── .gitignore         <- Git ignore file
+├── .pylintrc          <- Pylint linter configuration
 ├── LICENSE            <- MIT License
 ├── README.md          <- The top-level README for developers using this project
-├── data               <- Directory containing all data files
-│   ├── raw/           <- Directory for raw data
+├── GitVersion.yml     <- GitVersion configuration for automatic versioning
+├── pyproject.toml     <- Project configuration file with package metadata
+├── requirements.txt   <- Requirements file for reproducing the analysis environment
+├── dvc.yaml           <- DVC pipeline stages configuration
+├── dvc.lock           <- Current state of the DVC pipeline
+├── dvc_pipeline.png   <- Visual diagram of the DVC pipeline
+├── metrics.json       <- Evaluation metrics of the DVC evaluation stage
+│
+├── .dvc/              <- DVC configurations and cache
+├── .github/           <- GitHub-specific files
+│   ├── workflows/     <- GitHub Actions CI/CD workflows
+│   └── PULL_REQUEST_TEMPLATE.md <- Template for pull requests
+│
+├── data/              <- Directory containing all data files
+│   ├── raw/           <- Directory for raw data (populated by DVC pipeline)
 │   │   └── raw.tsv    <- The original, immutable restaurant reviews data
-│   └── processed/     <- Directory for processed data
+│   └── processed/     <- Directory for processed data (populated by DVC pipeline)
 │       ├── processed.npy  <- The processed dataset for modeling
 │       ├── labels.pkl     <- Labels for sentiment analysis
-│       ├── X_test.pkl     <- Test data for evaluation
-│       └── y_test.pkl     <- Test labels for evaluation
+│       ├── X_train.pkl    <- Training data features
+│       ├── y_train.pkl    <- Training data labels
+│       ├── X_test.pkl     <- Test data features
+│       └── y_test.pkl     <- Test data labels
 │
-├── model              <- Trained and serialized models and model artifacts
+├── lint/              <- Custom linting rules and configurations
+│   ├── __init__.py    <- Makes lint a Python package
+│   └── custom_rules.py <- Custom Pylint rules for ML best practices
+│
+├── metrics/           <- Generated metrics and badges
+│   ├── coverage.svg   <- Coverage badge
+│   ├── ml_scores.json <- ML performance metrics
+│   ├── ml_test_score.svg <- ML test score badge
+│   └── pylint.svg     <- Pylint score badge
+│
+├── model/             <- Trained and serialized models and model artifacts (populated by DVC pipeline)
 │   ├── model.pkl      <- The trained Gaussian Naive Bayes model
 │   └── bag_of_words.pkl <- The bag of words vectorizer for text preprocessing
 │
-├── notebooks          <- Jupyter notebooks for exploration and demonstration
+├── notebooks/         <- Jupyter notebooks for exploration and demonstration
 │   ├── 1.0-g17-exploration_of_data.ipynb <- Exploratory data analysis, separate from production code
 │   └── 2.0-g17-demonstration_of_data.ipynb <- Model demonstration using production code
 │
-├── pyproject.toml     <- Project configuration file with package metadata
-│
-├── requirements.txt   <- Requirements file for reproducing the analysis environment
-│
-├── sentiment_model_training <- Source code for use in this project
+├── sentiment_model_training/ <- Source code for use in this project
 │   ├── __init__.py    <- Makes sentiment_model_training a Python package
 │   │
-│   └── modeling       <- Scripts to train models and perform analysis
+│   └── modeling/      <- Scripts to train models and perform analysis
 │       ├── __init__.py
-│       ├── get_data.py  <- Script to download or generate data (equivalent to dataset.py)
-│       ├── preprocess.py <- Script to transform data (equivalent to features.py)
+│       ├── get_data.py  <- Script to download or generate data
+│       ├── preprocess.py <- Script to transform data
 │       ├── train.py   <- Script to train the sentiment analysis model
-│       └── evaluate.py <- Script to evaluate model performance (similar to predict.py)
-|
-├── tests              <- Automated tests
-|
-├── .dvc <- DVC configurations and cache
+│       └── evaluate.py <- Script to evaluate model performance
 │
-├── dvc.lock <- current state of the pipeline
-│
-├── dvc.yaml <- pipeline stages configuration
-│
-├── metrics.json <- evaluation metrics of the DVC evaluation stage
+└── tests/             <- Automated tests
+    ├── __init__.py    <- Makes tests a Python package
+    ├── conftest.py    <- Pytest configuration and fixtures
+    ├── test_feature_and_data.py <- Tests for data and feature processing
+    ├── test_ml_infrastructure.py <- Tests for ML infrastructure
+    ├── test_model_development.py <- Tests for model development
+    ├── test_monitoring.py <- Tests for monitoring capabilities
+    └── test_mutamorphic.py <- Metamorphic testing
 ```
 
 Similar to the cookiecutter template, our project separates:
 
-- Source code (`sentiment_model_training/`)
-- Data (`data/`)
-- Models (`model/`)
-- Documentation (`README.md`)
-- Dependencies (`requirements.txt`)
-- Notebooks (`notebooks/`)
+- **Source code** (`sentiment_model_training/`) - Production ML code
+- **Data** (`data/`) - Raw and processed datasets (managed by DVC)
+- **Models** (`model/`) - Trained models and artifacts (managed by DVC)
+- **Documentation** (`README.md`) - Project documentation
+- **Dependencies** (`requirements.txt`, `pyproject.toml`) - Package and dependency management
+- **Notebooks** (`notebooks/`) - Exploratory analysis and demonstrations
+- **Tests** (`tests/`) - Comprehensive test suite
+- **Linting** (`lint/`, `.pylintrc`, `.flake8`, `.bandit`) - Code quality and security tools
+- **Metrics** (`metrics/`) - Performance metrics and badges
+- **CI/CD** (`.github/`) - GitHub Actions workflows
+- **Configuration** (`GitVersion.yml`, `dvc.yaml`, `dvc.lock`) - Tool configurations
 
 The naming conventions are adapted to fit our specific sentiment analysis use case, while maintaining the logical separation of concerns of the cookiecutter template.
 
