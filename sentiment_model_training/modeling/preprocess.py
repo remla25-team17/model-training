@@ -102,6 +102,18 @@ if __name__ == "__main__":
         default=PROCESSED_DATA_PATH,
         help="output path of the data",
     )
+    parser.add_argument(
+        "--model_path",
+        type=str,
+        default=MODEL_PATH,
+        help="path to the model",
+    )
+    parser.add_argument(
+        "--max_features",
+        type=int,
+        default=MAX_FEATURES,
+        help="maximum number of features",
+    )
     args = parser.parse_args()
 
     main(args.input, args.output, args.model_path, args.max_features)
