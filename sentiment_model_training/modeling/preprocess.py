@@ -3,6 +3,7 @@ This module contains the code for preprocessing the dataset.
 """
 
 import os
+import argparse
 import pickle
 import pandas as pd
 import numpy as np
@@ -88,4 +89,31 @@ if __name__ == "__main__":
     MODEL_PATH = "model/"
     MAX_FEATURES = 1420
 
-    main(RAW_DATA_PATH, PROCESSED_DATA_PATH, MODEL_PATH, MAX_FEATURES)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=RAW_DATA_PATH,
+        help="input path of the data",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=PROCESSED_DATA_PATH,
+        help="output path of the data",
+    )
+    parser.add_argument(
+        "--model_path",
+        type=str,
+        default=MODEL_PATH,
+        help="path to the model",
+    )
+    parser.add_argument(
+        "--max_features",
+        type=int,
+        default=MAX_FEATURES,
+        help="maximum number of features",
+    )
+    args = parser.parse_args()
+
+    main(args.input, args.output, args.model_path, args.max_features)

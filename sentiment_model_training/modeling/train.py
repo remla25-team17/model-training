@@ -1,7 +1,7 @@
 """
 This module contains the code for training the sentiment model.
 """
-
+import argparse
 import os
 import joblib
 import numpy as np
@@ -46,5 +46,24 @@ if __name__ == "__main__":
     # Set the paths for the dataset and model directories
     PROCESSED_DATA_PATH = "data/processed/"
     MODEL_PATH = "model/"
+    TEST_SIZE = 0.20
+    RANDOM_STATE = 0
 
-    train_model(processed_data_path=PROCESSED_DATA_PATH, model_path=MODEL_PATH)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=PROCESSED_DATA_PATH,
+        help="input path of the data",
+    )
+    parser.add_argument("--model_path", type=str, default=MODEL_PATH, help="model path")
+    parser.add_argument("--test_size", type=float, default=TEST_SIZE, help="test size")
+    parser.add_argument("--seed", type=int, default=RANDOM_STATE, help="random state",)
+    args = parser.parse_args()
+
+    train_model(
+        processed_data_path=args.input,
+        model_path=args.model_path,
+        test_size=args.test_size,
+        random_state=args.seed,
+    )

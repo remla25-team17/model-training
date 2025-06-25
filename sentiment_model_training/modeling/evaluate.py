@@ -2,10 +2,17 @@
 This module contains the code for evaluating the sentiment model.
 """
 
+import argparse
 import os
-import joblib
 import json
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_score, recall_score
+import joblib
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    precision_score,
+    recall_score
+)
 
 
 def evaluate_model(processed_data_path: str = "data/processed/", model_path: str = "model/"):
@@ -42,7 +49,7 @@ def evaluate_model(processed_data_path: str = "data/processed/", model_path: str
     if not os.path.exists("metrics"):
         os.makedirs("metrics")
 
-    with open("metrics.json", "w") as f:
+    with open("metrics.json", "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=4)
 
     # Generate classification report
@@ -69,4 +76,19 @@ if __name__ == "__main__":
     PROCESSED_DATA_PATH = "data/processed"
     MODEL_PATH = "model/"
 
-    evaluate_model(processed_data_path=PROCESSED_DATA_PATH, model_path=MODEL_PATH)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=PROCESSED_DATA_PATH,
+        help="input path of the data",
+    )
+    parser.add_argument(
+        "--model_path",
+        type=str,
+        default=MODEL_PATH,
+        help="path to the model",
+    )
+    args = parser.parse_args()
+
+    evaluate_model(processed_data_path=args.input, model_path=args.model_path)

@@ -17,8 +17,9 @@ from sklearn.utils import shuffle
 def dataset():
     URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
     raw_path = Path("data/raw/raw.tsv")
+    raw_directory = Path("data/raw")
 
-    get_data(url=URL, save_path=raw_path)
+    get_data(url=URL, save_path=str(raw_directory))
     
     yield
     
@@ -29,7 +30,7 @@ def dataset():
             file.unlink()
 
 def test_latency(dataset):
-    preprocess.main("data/raw", "data/processed/", "model/", max_features=1420)
+    preprocess.main("data/raw/", "data/processed/", "model/", max_features=1420)
     
     train_model("data/processed/", "model/")
     
@@ -50,7 +51,7 @@ def test_latency(dataset):
        
     
 def test_memory_usage(dataset):
-    preprocess.main("data/raw", "data/processed/", "model/", max_features=1420)
+    preprocess.main("data/raw/", "data/processed/", "model/", max_features=1420)
     
     train_model("data/processed/", "model/")
     

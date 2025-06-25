@@ -3,6 +3,7 @@ This module contains the code for downloading the dataset from a given URL
  and saving it to a specified path.
 """
 
+import argparse
 import os
 import requests
 
@@ -21,7 +22,7 @@ def get_data(url: str, save_path: str):
     response = requests.get(url, timeout=5)
 
     if response.status_code == 200:
-        with open(save_path, 'wb') as file:
+        with open(os.path.join(save_path, "raw.tsv"), 'wb') as file:
             file.write(response.content)
         print(f"Dataset downloaded and saved to {save_path}")
     else:
@@ -35,6 +36,21 @@ if __name__ == "__main__":
         "https://raw.githubusercontent.com/proksch"
         "/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
     )
-    SAVE_PATH = "data/raw/raw.tsv"
+    SAVE_PATH = "data/raw/"
 
-    get_data(url=URL, save_path=SAVE_PATH)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--url",
+        type=str,
+        default=URL,
+        help="url for where to download the raw dataset",
+    )
+    parser.add_argument(
+        "--save_path",
+        type=str,
+        default=SAVE_PATH,
+        help="directory for where to save the raw dataset",
+    )
+    args = parser.parse_args()
+
+    get_data(url=args.url, save_path=args.save_path)
