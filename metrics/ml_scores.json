@@ -1,8 +1,8 @@
 {
   "sections": {
     "Data Tests": {
-      "score": 5,
-      "max_score": 5
+      "score": 1,
+      "max_score": 1
     },
     "ML Infrastructure Tests": {
       "score": 2,
